@@ -13,65 +13,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== CSS CUSTOM (Rata Kanan-Kiri) =====
+# ===== CSS CUSTOM =====
 st.markdown("""
 <style>
-    /* Container chat */
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    
-    /* Bubble User (Kanan) */
-    .chat-user {
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .chat-user .bubble {
-        background-color: #A855F7; /* Warna ungu tema kamu */
-        color: white;
-        padding: 12px 16px;
-        border-radius: 15px 15px 0px 15px; /* Sudut melengkung */
-        max-width: 75%;
-        word-wrap: break-word;
-    }
-    
-    /* Bubble AI (Kiri) */
-    .chat-ai {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .chat-ai .bubble {
-        background-color: #2D2D2D; /* Warna abu gelap */
-        color: #E0E0E0;
-        padding: 12px 16px;
-        border-radius: 15px 15px 15px 0px;
-        max-width: 75%;
-        word-wrap: break-word;
-    }
-    
-    /* Avatar */
-    .avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        background-color: #444;
-    }
+    .chat-user { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+    .chat-user .bubble { background-color: #A855F7; color: white; padding: 10px 15px; border-radius: 15px 15px 0px 15px; max-width: 75%; }
+    .chat-ai { display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 15px; }
+    .chat-ai .bubble { background-color: #2D2D2D; color: #E0E0E0; padding: 10px 15px; border-radius: 15px 15px 15px 0px; max-width: 75%; }
+    .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #444; }
 </style>
 """, unsafe_allow_html=True)
 
-# ===== SETUP API =====
+# ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
+
+# Jika user belum login, tampilkan halaman login dan hentikan program
+if not st.user.is_logged_in:
+    st.title("🤖 Chatbot AI Portofolio")
+    st.write("Silakan login untuk mulai menggunakan chatbot.")
+    if st.button("Login with Google", type="primary"):
+        st.login()
+    st.stop() # Ini menghentikan kode di bawahnya agar tidak dieksekusi sebelum login
+
+# Jika sudah login, ambil email user
+user_email = st.user.email
+folder_user = f"data_{user_email.replace('@', '_').replace('.', '_')}"
+os.makedirs(folder_user, exist_ok=True)
+FILE_DB = os.path.join(folder_user, "chats.json")
 
 # Daftar kepribadian AI
 PERSONAS = {
@@ -82,12 +50,9 @@ PERSONAS = {
 }
 
 def get_system_prompt():
-    persona_pilihan = st.session_state.get("persona", "Asisten Ramah")
-    return PERSONAS[persona_pilihan]
+    return PERSONAS[st.session_state.get("persona", "Asisten Ramah")]
 
 # ===== FUNGSI SIMPAN & MUAT =====
-FILE_DB = "chats.json"
-
 def simpan_ke_file():
     with open(FILE_DB, "w", encoding="utf-8") as f:
         json.dump(st.session_state.conversations, f, ensure_ascii=False, indent=2)
@@ -121,10 +86,7 @@ def ambil_chat_aktif():
 # ===== INISIALISASI STATE =====
 if "conversations" not in st.session_state:
     data_lama = muat_dari_file()
-    if data_lama:
-        st.session_state.conversations = data_lama
-    else:
-        st.session_state.conversations = {}
+    st.session_state.conversations = data_lama if data_lama else {}
 
 if "current_id" not in st.session_state:
     if st.session_state.conversations:
@@ -135,13 +97,13 @@ if "current_id" not in st.session_state:
 # ===== SIDEBAR =====
 with st.sidebar:
     st.title("💬 Percakapan")
+    st.caption(f"Login: **{user_email}**")
     
-    st.selectbox(
-        "Pilih Kepribadian AI:", 
-        list(PERSONAS.keys()), 
-        key="persona"
-    )
+    if st.button("Logout", use_container_width=True):
+        st.logout()
     
+    st.markdown("---")
+    st.selectbox("Pilih Kepribadian AI:", list(PERSONAS.keys()), key="persona")
     st.markdown("---")
     
     if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
@@ -169,10 +131,7 @@ with st.sidebar:
     st.markdown("---")
     
     chat_aktif = ambil_chat_aktif()
-    teks_chat = ""
-    for msg in chat_aktif["messages"]:
-        if msg["role"] != "system":
-            teks_chat += f"{msg['role'].upper()}: {msg['content']}\n\n"
+    teks_chat = "".join([f"{msg['role'].upper()}: {msg['content']}\n\n" for msg in chat_aktif["messages"] if msg["role"] != "system"])
     
     st.download_button(
         label="📥 Download Chat (TXT)",
@@ -183,7 +142,6 @@ with st.sidebar:
     )
 
     st.markdown("---")
-
     st.subheader("📄 Upload Dokumen")
     uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
     
@@ -191,7 +149,6 @@ with st.sidebar:
         if st.button("Proses PDF", use_container_width=True):
             with st.spinner("Membaca PDF..."):
                 pdf_text = extract_text_from_pdf(uploaded_file)
-                chat_aktif = ambil_chat_aktif()
                 chat_aktif["messages"].append({
                     "role": "system", 
                     "content": f"Gunakan informasi dari dokumen berikut untuk menjawab pertanyaan user:\n\n{pdf_text[:10000]}" 
@@ -209,29 +166,13 @@ if chat["messages"][0]["role"] == "system":
 st.title(f"🤖 {chat['title']}")
 st.caption("Tanya apa aja, aku siap bantu!")
 
-# Tampilkan history pakai Custom HTML
 for p in chat["messages"]:
-    if p["role"] == "system":
-        continue
-        
+    if p["role"] == "system": continue
     if p["role"] == "user":
-        # Tampilan Pesan User (Kanan)
-        st.markdown(f"""
-        <div class="chat-user">
-            <div class="bubble">{p["content"]}</div>
-            <div class="avatar">🧑</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-user"><div class="bubble">{p["content"]}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
     else:
-        # Tampilan Pesan AI (Kiri)
-        st.markdown(f"""
-        <div class="chat-ai">
-            <div class="avatar">🤖</div>
-            <div class="bubble">{p["content"]}</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-ai"><div class="avatar">🤖</div><div class="bubble">{p["content"]}</div></div>', unsafe_allow_html=True)
 
-# Input user
 user = st.chat_input("Ketik pesan...")
 
 if user:
@@ -239,16 +180,8 @@ if user:
         chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
     
     chat["messages"].append({"role": "user", "content": user})
-    
-    # Tampilkan pesan user langsung
-    st.markdown(f"""
-    <div class="chat-user">
-        <div class="bubble">{user}</div>
-        <div class="avatar">🧑</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="chat-user"><div class="bubble">{user}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
 
-    # Minta jawaban AI
     with st.spinner("AI sedang mengetik..."):
         try:
             stream = client.chat.completions.create(
@@ -256,7 +189,6 @@ if user:
                 messages=chat["messages"],
                 stream=True 
             )
-            
             def generate_chunks():
                 for chunk in stream:
                     if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
@@ -267,9 +199,6 @@ if user:
             if jawab:
                 chat["messages"].append({"role": "assistant", "content": jawab})
                 simpan_ke_file()
-                st.rerun() # Refresh biar format HTML-nya bener
-            else:
-                st.warning("⚠️ AI tidak mengembalikan teks. Coba lagi.")
-                
+                st.rerun()
         except Exception as e:
             st.error(f"⚠️ Error: {e}")
