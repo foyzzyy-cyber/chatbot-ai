@@ -2,6 +2,7 @@ import streamlit as st
 from groq import Groq
 import uuid
 import json
+from pypdf import PdfReader
 import os
 
 # ===== KONFIGURASI HALAMAN =====
@@ -42,6 +43,14 @@ def muat_dari_file():
         with open(FILE_DB, "r", encoding="utf-8") as f:
             return json.load(f)
     return None
+
+def extract_text_from_pdf(file):
+    """Baca teks dari file PDF yang di-upload."""
+    reader = PdfReader(file)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text() + "\n"
+    return text
 
 # ===== FUNGSI BANTU =====
 def bikin_chat_baru():
@@ -126,6 +135,27 @@ with st.sidebar:
         mime="text/plain",
         use_container_width=True
     )
+
+    st.markdown("---")
+
+    # Fitur Upload PDF
+    st.subheader("📄 Upload Dokumen")
+    uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
+    
+    if uploaded_file is not None:
+        if st.button("Proses PDF", use_container_width=True):
+            with st.spinner("Membaca PDF..."):
+                pdf_text = extract_text_from_pdf(uploaded_file)
+                # Masukkan teks PDF ke history chat sebagai "system context"
+                chat_aktif = ambil_chat_aktif()
+                chat_aktif["messages"].append({
+                    "role": "system", 
+                    "content": f"Gunakan informasi dari dokumen berikut untuk menjawab pertanyaan user:\n\n{pdf_text[:10000]}" 
+                    # Dibatasi 10.000 karakter biar nggak kena limit token
+                })
+                simpan_ke_file()
+                st.success("PDF berhasil diproses! Silakan tanya sesuatu tentang isi dokumen.")
+                st.rerun()
 
 # ===== AREA CHAT =====
 chat = ambil_chat_aktif()
