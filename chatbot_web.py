@@ -15,12 +15,18 @@ st.set_page_config(
 # ===== SETUP API =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
-SYSTEM = """Kamu adalah Chatbot Saya, asisten AI berbahasa Indonesia.
-- Namamu "Chatbot Saya", bukan ChatGPT, bukan GPT, bukan Llama.
-- Jawab dengan jelas, ramah, dan secukupnya.
-- Kalau pertanyaannya simpel, jawab singkat.
-- Pakai emoji secukupnya, jangan berlebihan.
-- Kalau nggak tahu, bilang nggak tahu."""
+# Daftar kepribadian AI
+PERSONAS = {
+    "Asisten Ramah": "Kamu adalah Chatbot Saya, asisten AI yang ramah, suka bercanda, dan membantu.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. Jelaskan konsep dengan langkah-langkah sederhana dan contoh.",
+    "Koki Profesional": "Kamu adalah koki profesional. Bantu user dengan resep, tips memasak, dan bahan pengganti.",
+    "Programmer Expert": "Kamu adalah senior programmer. Bantu user debugging dan jelaskan kode dengan bahasa yang mudah dipahami."
+}
+
+# Fungsi buat dapetin system prompt berdasarkan pilihan
+def get_system_prompt():
+    persona_pilihan = st.session_state.get("persona", "Asisten Ramah")
+    return PERSONAS[persona_pilihan]
 
 # ===== FUNGSI SIMPAN & MUAT =====
 FILE_DB = "chats.json"
@@ -43,7 +49,7 @@ def bikin_chat_baru():
     new_id = str(uuid.uuid4())[:8]   # ID unik 8 karakter
     st.session_state.conversations[new_id] = {
         "title": "Chat Baru",
-        "messages": [{"role": "system", "content": SYSTEM}]
+        "messages": [{"role": "system", "content": get_system_prompt()}]
     }
     st.session_state.current_id = new_id
     simpan_ke_file() # <--- AUTO SAVE SAAT BIKIN CHAT BARU
@@ -70,6 +76,15 @@ if "current_id" not in st.session_state:
 with st.sidebar:
     st.title("💬 Percakapan")
     
+    # Dropdown Ganti Persona
+    st.selectbox(
+        "Pilih Kepribadian AI:", 
+        list(PERSONAS.keys()), 
+        key="persona"
+    )
+    
+    st.markdown("---")
+    
     # Tombol chat baru
     if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
         bikin_chat_baru()
@@ -95,8 +110,29 @@ with st.sidebar:
             simpan_ke_file() # <--- AUTO SAVE SAAT HAPUS CHAT
             st.rerun()
 
+    st.markdown("---")
+    
+    # Tombol Export Chat
+    chat_aktif = ambil_chat_aktif()
+    teks_chat = ""
+    for msg in chat_aktif["messages"]:
+        if msg["role"] != "system":
+            teks_chat += f"{msg['role'].upper()}: {msg['content']}\n\n"
+    
+    st.download_button(
+        label="📥 Download Chat (TXT)",
+        data=teks_chat,
+        file_name=f"chat_{chat_aktif['title']}.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
+
 # ===== AREA CHAT =====
 chat = ambil_chat_aktif()
+
+# Update system prompt kalau user ganti persona
+if chat["messages"][0]["role"] == "system":
+    chat["messages"][0]["content"] = get_system_prompt()
 
 st.title(f"🤖 {chat['title']}")
 st.caption("Tanya apa aja, aku siap bantu!")
