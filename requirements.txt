@@ -1,3 +1,5 @@
 streamlit
 groq
 pypdf
+streamlit[auth]
+httpx
