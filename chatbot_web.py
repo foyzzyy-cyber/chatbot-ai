@@ -13,6 +13,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ===== CSS CUSTOM BUAT NGISI CHAT KE KANAN =====
+# Trik ini "membalik" posisi chat, lalu membalik teksnya lagi biar tetep kebaca.
+st.markdown("""
+<style>
+    /* Bikin chat user ada di kanan */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
+        flex-direction: row-reverse;
+        text-align: right;
+    }
+    
+    /* Bikin chat AI tetep di kiri */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
+        flex-direction: row;
+        text-align: left;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ===== SETUP API =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
@@ -24,7 +42,6 @@ PERSONAS = {
     "Programmer Expert": "Kamu adalah senior programmer. Bantu user debugging dan jelaskan kode dengan bahasa yang mudah dipahami."
 }
 
-# Fungsi buat dapetin system prompt berdasarkan pilihan
 def get_system_prompt():
     persona_pilihan = st.session_state.get("persona", "Asisten Ramah")
     return PERSONAS[persona_pilihan]
@@ -33,19 +50,16 @@ def get_system_prompt():
 FILE_DB = "chats.json"
 
 def simpan_ke_file():
-    """Simpan semua percakapan ke file JSON."""
     with open(FILE_DB, "w", encoding="utf-8") as f:
         json.dump(st.session_state.conversations, f, ensure_ascii=False, indent=2)
 
 def muat_dari_file():
-    """Muat percakapan dari file JSON kalau ada."""
     if os.path.exists(FILE_DB):
         with open(FILE_DB, "r", encoding="utf-8") as f:
             return json.load(f)
     return None
 
 def extract_text_from_pdf(file):
-    """Baca teks dari file PDF yang di-upload."""
     reader = PdfReader(file)
     text = ""
     for page in reader.pages:
@@ -54,17 +68,15 @@ def extract_text_from_pdf(file):
 
 # ===== FUNGSI BANTU =====
 def bikin_chat_baru():
-    """Bikin percakapan baru, return ID-nya."""
-    new_id = str(uuid.uuid4())[:8]   # ID unik 8 karakter
+    new_id = str(uuid.uuid4())[:8]
     st.session_state.conversations[new_id] = {
         "title": "Chat Baru",
         "messages": [{"role": "system", "content": get_system_prompt()}]
     }
     st.session_state.current_id = new_id
-    simpan_ke_file() # <--- AUTO SAVE SAAT BIKIN CHAT BARU
+    simpan_ke_file()
 
 def ambil_chat_aktif():
-    """Ambil data percakapan yang lagi aktif."""
     return st.session_state.conversations[st.session_state.current_id]
 
 # ===== INISIALISASI STATE =====
@@ -85,7 +97,6 @@ if "current_id" not in st.session_state:
 with st.sidebar:
     st.title("💬 Percakapan")
     
-    # Dropdown Ganti Persona
     st.selectbox(
         "Pilih Kepribadian AI:", 
         list(PERSONAS.keys()), 
@@ -94,14 +105,12 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Tombol chat baru
     if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
         bikin_chat_baru()
         st.rerun()
     
     st.markdown("---")
     
-    # Daftar semua percakapan
     for chat_id, chat_data in st.session_state.conversations.items():
         is_active = (chat_id == st.session_state.current_id)
         label = f"{'🟢 ' if is_active else '▫️ '}{chat_data['title']}"
@@ -111,17 +120,15 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Tombol hapus chat aktif
     if len(st.session_state.conversations) > 1:
         if st.button("🗑️ Hapus Chat Ini", use_container_width=True):
             del st.session_state.conversations[st.session_state.current_id]
             st.session_state.current_id = list(st.session_state.conversations.keys())[0]
-            simpan_ke_file() # <--- AUTO SAVE SAAT HAPUS CHAT
+            simpan_ke_file()
             st.rerun()
 
     st.markdown("---")
     
-    # Tombol Export Chat
     chat_aktif = ambil_chat_aktif()
     teks_chat = ""
     for msg in chat_aktif["messages"]:
@@ -138,7 +145,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Fitur Upload PDF
     st.subheader("📄 Upload Dokumen")
     uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
     
@@ -146,21 +152,18 @@ with st.sidebar:
         if st.button("Proses PDF", use_container_width=True):
             with st.spinner("Membaca PDF..."):
                 pdf_text = extract_text_from_pdf(uploaded_file)
-                # Masukkan teks PDF ke history chat sebagai "system context"
                 chat_aktif = ambil_chat_aktif()
                 chat_aktif["messages"].append({
                     "role": "system", 
                     "content": f"Gunakan informasi dari dokumen berikut untuk menjawab pertanyaan user:\n\n{pdf_text[:10000]}" 
-                    # Dibatasi 10.000 karakter biar nggak kena limit token
                 })
                 simpan_ke_file()
-                st.success("PDF berhasil diproses! Silakan tanya sesuatu tentang isi dokumen.")
+                st.success("PDF berhasil diproses!")
                 st.rerun()
 
 # ===== AREA CHAT =====
 chat = ambil_chat_aktif()
 
-# Update system prompt kalau user ganti persona
 if chat["messages"][0]["role"] == "system":
     chat["messages"][0]["content"] = get_system_prompt()
 
@@ -173,26 +176,21 @@ for p in chat["messages"]:
         continue
     avatar = "🧑" if p["role"] == "user" else "🤖"
     with st.chat_message(p["role"], avatar=avatar):
-        # UBAH DARI st.write JADI st.markdown
         st.markdown(p["content"])
 
 # Input user
 user = st.chat_input("Ketik pesan...")
 
 if user:
-    # Kalau ini pesan pertama, jadikan judul chat
     if len(chat["messages"]) == 1:
         chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
     
-    # Tampilkan pesan user
     chat["messages"].append({"role": "user", "content": user})
     with st.chat_message("user", avatar="🧑"):
         st.markdown(user)
 
-    # Minta jawaban AI (STREAMING)
     with st.chat_message("assistant", avatar="🤖"):
         try:
-            # Tambahkan stream=True
             stream = client.chat.completions.create(
                 model="openai/gpt-oss-120b",
                 messages=chat["messages"],
@@ -201,14 +199,11 @@ if user:
             
             def generate_chunks():
                 for chunk in stream:
-                    # Cek yang lebih aman buat nampilin teks
                     if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
                         yield chunk.choices[0].delta.content
             
-            # Tampilkan dengan efek ngetik (st.write_stream otomatis render markdown)
             jawab = st.write_stream(generate_chunks())
             
-            # Simpan jawaban utuh ke history
             if jawab:
                 chat["messages"].append({"role": "assistant", "content": jawab})
                 simpan_ke_file()
