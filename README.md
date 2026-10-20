@@ -17,6 +17,7 @@ Chatbot AI interaktif yang dibangun menggunakan Python, Streamlit, dan Groq API.
 ## 🔗 Live Demo
 Kamu bisa mencoba aplikasinya secara langsung di sini:
 **[Chatbot AI Revaldi](https://chatbot-ai-revaldi.streamlit.app)**
-
+## 📸 Tampilan Aplikasi
+![Screenshot Chatbot](screenshot-chatbot.png.png)
 ---
 *Dibuat dengan ❤️ menggunakan Python dan Streamlit.*
