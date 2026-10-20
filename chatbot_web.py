@@ -13,20 +13,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== CSS CUSTOM BUAT NGISI CHAT KE KANAN =====
-# Trik ini "membalik" posisi chat, lalu membalik teksnya lagi biar tetep kebaca.
+# ===== CSS CUSTOM BUAT NGESER CHAT USER KE KANAN =====
 st.markdown("""
 <style>
-    /* Bikin chat user ada di kanan */
+    /* Target semua chat message */
+    div[data-testid="stChatMessage"] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Trik: Pilih chat message yang punya avatar user (🧑) */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        flex-direction: row-reverse;
+        flex-direction: row-reverse !important;
         text-align: right;
+        background-color: rgba(168, 85, 247, 0.1); /* Warna ungu transparan */
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    /* Pilih chat message yang punya avatar assistant (🤖) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
+        flex-direction: row !important;
+        text-align: left;
     }
     
-    /* Bikin chat AI tetep di kiri */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        flex-direction: row;
-        text-align: left;
+    /* Rapihin teks di dalam bubble chat */
+    div[data-testid="stChatMessage"] > div {
+        max-width: 80%;
     }
 </style>
 """, unsafe_allow_html=True)
