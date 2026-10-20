@@ -3,3 +3,5 @@ groq
 pypdf
 streamlit[auth]
 httpx
+requests
+beautifulsoup4
