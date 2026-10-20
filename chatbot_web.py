@@ -6,6 +6,7 @@ from pypdf import PdfReader
 import os
 import requests
 from bs4 import BeautifulSoup
+import markdown # <-- Library baru buat render rumus
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -23,6 +24,10 @@ st.markdown("""
     .chat-ai { display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 15px; }
     .chat-ai .bubble { background-color: #2D2D2D; color: #E0E0E0; padding: 10px 15px; border-radius: 15px 15px 15px 0px; max-width: 75%; }
     .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #444; }
+    
+    /* Welcome Screen */
+    .welcome-container { text-align: center; margin-top: 50px; color: #888; }
+    .welcome-container h1 { color: #A855F7; font-size: 3em; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -71,18 +76,14 @@ def extract_text_from_pdf(file):
     return text
 
 def ambil_teks_dari_url(url):
-    """Ambil teks dari halaman web."""
     try:
-        headers = {'User-Agent': 'Mozilla/5.0'} # Biar nggak diblokir web
+        headers = {'User-Agent': 'Mozilla/5.0'}
         response = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Buang script & style biar teksnya bersih
         for script in soup(["script", "style"]):
             script.decompose()
-            
         text = soup.get_text(separator=' ', strip=True)
-        return text[:15000] # Batasi 15.000 karakter biar nggak kena limit token
+        return text[:15000]
     except Exception as e:
         return f"Error: Gagal mengambil teks dari URL. ({e})"
 
@@ -197,16 +198,32 @@ chat = ambil_chat_aktif()
 if chat["messages"][0]["role"] == "system":
     chat["messages"][0]["content"] = get_system_prompt()
 
-st.title(f"🤖 {chat['title']}")
-st.caption("Tanya apa aja, aku siap bantu!")
+# Cek kalau chat masih kosong (baru dibuat), tampilkan Welcome Screen
+if len(chat["messages"]) == 1:
+    st.markdown("""
+    <div class="welcome-container">
+        <h1>👋 Selamat Datang!</h1>
+        <p>Aku adalah asisten AI kamu. Silakan tanya apa aja, upload PDF, atau masukin link artikel.</p>
+        <p>Coba ketik sesuatu di kolom bawah untuk memulai! 🚀</p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.title(f"🤖 {chat['title']}")
+    st.caption("Tanya apa aja, aku siap bantu!")
 
-for p in chat["messages"]:
-    if p["role"] == "system": continue
-    if p["role"] == "user":
-        st.markdown(f'<div class="chat-user"><div class="bubble">{p["content"]}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="chat-ai"><div class="avatar">🤖</div><div class="bubble">{p["content"]}</div></div>', unsafe_allow_html=True)
+    # Tampilkan history
+    for p in chat["messages"]:
+        if p["role"] == "system": continue
+        
+        # Konversi Markdown ke HTML biar render rumus & teks lebih rapi
+        teks_html = markdown.markdown(p["content"])
+        
+        if p["role"] == "user":
+            st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="chat-ai"><div class="avatar">🤖</div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
+# Input user
 user = st.chat_input("Ketik pesan...")
 
 if user:
@@ -214,7 +231,10 @@ if user:
         chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
     
     chat["messages"].append({"role": "user", "content": user})
-    st.markdown(f'<div class="chat-user"><div class="bubble">{user}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
+    
+    # Render pesan user pakai markdown
+    teks_html_user = markdown.markdown(user)
+    st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html_user}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
 
     with st.spinner("AI sedang mengetik..."):
         try:
