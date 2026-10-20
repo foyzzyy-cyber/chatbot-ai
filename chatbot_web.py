@@ -16,30 +16,35 @@ st.set_page_config(
 # ===== CSS CUSTOM BUAT NGESER CHAT USER KE KANAN =====
 st.markdown("""
 <style>
-    /* Target semua chat message */
+    /* 1. Target container chat utama */
     div[data-testid="stChatMessage"] {
         display: flex;
-        flex-direction: column;
+        align-items: flex-start;
     }
 
-    /* Trik: Pilih chat message yang punya avatar user (🧑) */
+    /* 2. Trik: Balikin urutan buat chat user (Avatar di kanan) */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
         flex-direction: row-reverse !important;
-        text-align: right;
-        background-color: rgba(168, 85, 247, 0.1); /* Warna ungu transparan */
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    /* Pilih chat message yang punya avatar assistant (🤖) */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        flex-direction: row !important;
-        text-align: left;
     }
     
-    /* Rapihin teks di dalam bubble chat */
-    div[data-testid="stChatMessage"] > div {
-        max-width: 80%;
+    /* 3. Bikin background bubble user agak beda + jarak dari avatar */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) > div:nth-child(2) {
+        background-color: #2D2D2D;
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin-right: 10px; /* Jarak dari avatar */
+        max-width: 75%;     /* Biar nggak kepanjangan */
+    }
+
+    /* 4. Teks user rata kanan */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) > div:nth-child(2) p {
+        text-align: right;
+    }
+
+    /* 5. Jarak buat chat AI (kiri) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) > div:nth-child(2) {
+        margin-left: 10px;
+        max-width: 85%;
     }
 </style>
 """, unsafe_allow_html=True)
