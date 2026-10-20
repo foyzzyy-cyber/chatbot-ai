@@ -4,6 +4,8 @@ import uuid
 import json
 from pypdf import PdfReader
 import os
+import requests
+from bs4 import BeautifulSoup
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -27,15 +29,13 @@ st.markdown("""
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
-# Jika user belum login, tampilkan halaman login dan hentikan program
 if not st.user.is_logged_in:
     st.title("🤖 Chatbot AI Portofolio")
     st.write("Silakan login untuk mulai menggunakan chatbot.")
     if st.button("Login with Google", type="primary"):
         st.login()
-    st.stop() # Ini menghentikan kode di bawahnya agar tidak dieksekusi sebelum login
+    st.stop()
 
-# Jika sudah login, ambil email user
 user_email = st.user.email
 folder_user = f"data_{user_email.replace('@', '_').replace('.', '_')}"
 os.makedirs(folder_user, exist_ok=True)
@@ -69,6 +69,22 @@ def extract_text_from_pdf(file):
     for page in reader.pages:
         text += page.extract_text() + "\n"
     return text
+
+def ambil_teks_dari_url(url):
+    """Ambil teks dari halaman web."""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'} # Biar nggak diblokir web
+        response = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Buang script & style biar teksnya bersih
+        for script in soup(["script", "style"]):
+            script.decompose()
+            
+        text = soup.get_text(separator=' ', strip=True)
+        return text[:15000] # Batasi 15.000 karakter biar nggak kena limit token
+    except Exception as e:
+        return f"Error: Gagal mengambil teks dari URL. ({e})"
 
 # ===== FUNGSI BANTU =====
 def bikin_chat_baru():
@@ -157,6 +173,24 @@ with st.sidebar:
                 st.success("PDF berhasil diproses!")
                 st.rerun()
 
+    st.markdown("---")
+    st.subheader("🌐 Baca dari Link")
+    url_input = st.text_input("Masukkan URL artikel:")
+    
+    if st.button("Proses Link", use_container_width=True):
+        if url_input:
+            with st.spinner("Membaca web..."):
+                teks_web = ambil_teks_dari_url(url_input)
+                chat_aktif["messages"].append({
+                    "role": "system", 
+                    "content": f"Gunakan informasi dari web berikut untuk menjawab pertanyaan user:\n\n{teks_web}"
+                })
+                simpan_ke_file()
+                st.success("Link berhasil diproses! Silakan tanya sesuatu tentang isi web.")
+                st.rerun()
+        else:
+            st.warning("Masukkan URL dulu ya.")
+
 # ===== AREA CHAT =====
 chat = ambil_chat_aktif()
 
@@ -189,6 +223,7 @@ if user:
                 messages=chat["messages"],
                 stream=True 
             )
+            
             def generate_chunks():
                 for chunk in stream:
                     if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
