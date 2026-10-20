@@ -13,38 +13,59 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== CSS CUSTOM BUAT NGESER CHAT USER KE KANAN =====
+# ===== CSS CUSTOM (Rata Kanan-Kiri) =====
 st.markdown("""
 <style>
-    /* 1. Target container chat utama */
-    div[data-testid="stChatMessage"] {
+    /* Container chat */
+    .chat-container {
         display: flex;
-        align-items: flex-start;
-    }
-
-    /* 2. Trik: Balikin urutan buat chat user (Avatar di kanan) */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        flex-direction: row-reverse !important;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
     }
     
-    /* 3. Bikin background bubble user agak beda + jarak dari avatar */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) > div:nth-child(2) {
-        background-color: #2D2D2D;
-        padding: 10px 15px;
-        border-radius: 15px;
-        margin-right: 10px; /* Jarak dari avatar */
-        max-width: 75%;     /* Biar nggak kepanjangan */
+    /* Bubble User (Kanan) */
+    .chat-user {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        gap: 10px;
     }
-
-    /* 4. Teks user rata kanan */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) > div:nth-child(2) p {
-        text-align: right;
+    .chat-user .bubble {
+        background-color: #A855F7; /* Warna ungu tema kamu */
+        color: white;
+        padding: 12px 16px;
+        border-radius: 15px 15px 0px 15px; /* Sudut melengkung */
+        max-width: 75%;
+        word-wrap: break-word;
     }
-
-    /* 5. Jarak buat chat AI (kiri) */
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) > div:nth-child(2) {
-        margin-left: 10px;
-        max-width: 85%;
+    
+    /* Bubble AI (Kiri) */
+    .chat-ai {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .chat-ai .bubble {
+        background-color: #2D2D2D; /* Warna abu gelap */
+        color: #E0E0E0;
+        padding: 12px 16px;
+        border-radius: 15px 15px 15px 0px;
+        max-width: 75%;
+        word-wrap: break-word;
+    }
+    
+    /* Avatar */
+    .avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background-color: #444;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -188,13 +209,27 @@ if chat["messages"][0]["role"] == "system":
 st.title(f"🤖 {chat['title']}")
 st.caption("Tanya apa aja, aku siap bantu!")
 
-# Tampilkan history
+# Tampilkan history pakai Custom HTML
 for p in chat["messages"]:
     if p["role"] == "system":
         continue
-    avatar = "🧑" if p["role"] == "user" else "🤖"
-    with st.chat_message(p["role"], avatar=avatar):
-        st.markdown(p["content"])
+        
+    if p["role"] == "user":
+        # Tampilan Pesan User (Kanan)
+        st.markdown(f"""
+        <div class="chat-user">
+            <div class="bubble">{p["content"]}</div>
+            <div class="avatar">🧑</div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Tampilan Pesan AI (Kiri)
+        st.markdown(f"""
+        <div class="chat-ai">
+            <div class="avatar">🤖</div>
+            <div class="bubble">{p["content"]}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Input user
 user = st.chat_input("Ketik pesan...")
@@ -204,10 +239,17 @@ if user:
         chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
     
     chat["messages"].append({"role": "user", "content": user})
-    with st.chat_message("user", avatar="🧑"):
-        st.markdown(user)
+    
+    # Tampilkan pesan user langsung
+    st.markdown(f"""
+    <div class="chat-user">
+        <div class="bubble">{user}</div>
+        <div class="avatar">🧑</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with st.chat_message("assistant", avatar="🤖"):
+    # Minta jawaban AI
+    with st.spinner("AI sedang mengetik..."):
         try:
             stream = client.chat.completions.create(
                 model="openai/gpt-oss-120b",
@@ -225,6 +267,7 @@ if user:
             if jawab:
                 chat["messages"].append({"role": "assistant", "content": jawab})
                 simpan_ke_file()
+                st.rerun() # Refresh biar format HTML-nya bener
             else:
                 st.warning("⚠️ AI tidak mengembalikan teks. Coba lagi.")
                 
