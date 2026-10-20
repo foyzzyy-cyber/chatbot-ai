@@ -173,7 +173,8 @@ for p in chat["messages"]:
         continue
     avatar = "🧑" if p["role"] == "user" else "🤖"
     with st.chat_message(p["role"], avatar=avatar):
-        st.write(p["content"])
+        # UBAH DARI st.write JADI st.markdown
+        st.markdown(p["content"])
 
 # Input user
 user = st.chat_input("Ketik pesan...")
@@ -186,8 +187,8 @@ if user:
     # Tampilkan pesan user
     chat["messages"].append({"role": "user", "content": user})
     with st.chat_message("user", avatar="🧑"):
-        st.write(user)
-    
+        st.markdown(user)
+
     # Minta jawaban AI (STREAMING)
     with st.chat_message("assistant", avatar="🤖"):
         try:
@@ -204,7 +205,7 @@ if user:
                     if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
                         yield chunk.choices[0].delta.content
             
-            # Tampilkan dengan efek ngetik
+            # Tampilkan dengan efek ngetik (st.write_stream otomatis render markdown)
             jawab = st.write_stream(generate_chunks())
             
             # Simpan jawaban utuh ke history
