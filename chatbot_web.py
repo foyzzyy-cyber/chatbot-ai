@@ -62,13 +62,16 @@ st.markdown(f"""
         justify-content: flex-end;
     }}
     .chat-row.user .bubble {{
-        background-color: #2D2D2D; /* Warna abu gelap ala ChatGPT */
+        background-color: #2D2D2D;
         color: white;
         padding: 12px 18px;
-        border-radius: 12px;
-        max-width: 80%;
+        border-radius: 18px;
+        border-top-right-radius: 4px; /* Bikin ujungnya lancip */
+        max-width: 75%;
         font-size: 15px;
         line-height: 1.6;
+        width: fit-content; /* <--- INI BIAR NGGAK GEPENG */
+        word-wrap: break-word;
     }}
     .chat-row.user .avatar {{
         margin-left: 12px;
@@ -85,10 +88,9 @@ st.markdown(f"""
         justify-content: flex-start;
     }}
     .chat-row.ai .bubble {{
-        background-color: transparent; /* AI tanpa background ala Claude */
+        background-color: transparent;
         color: #E0E0E0;
-        padding: 12px 18px 12px 0px;
-        border-radius: 12px;
+        padding: 12px 0px 12px 18px;
         max-width: 85%;
         font-size: 15px;
         line-height: 1.6;
@@ -98,12 +100,12 @@ st.markdown(f"""
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background-color: #A855F7; /* Warna ungu buat AI */
+        background-color: #A855F7;
         background-size: cover;
         flex-shrink: 0;
     }}
     
-    /* 7. Welcome Screen yang lebih classy */
+    /* 7. Welcome Screen */
     .welcome-container {{
         text-align: center;
         margin-top: 20vh;
