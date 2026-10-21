@@ -6,7 +6,10 @@ from pypdf import PdfReader
 import os
 import requests
 from bs4 import BeautifulSoup
-import markdown # <-- Library baru buat render rumus
+import markdown
+import sounddevice as sd
+from scipy.io.wavfile import write
+import speech_recognition as sr
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -24,8 +27,6 @@ st.markdown("""
     .chat-ai { display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 15px; }
     .chat-ai .bubble { background-color: #2D2D2D; color: #E0E0E0; padding: 10px 15px; border-radius: 15px 15px 15px 0px; max-width: 75%; }
     .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #444; }
-    
-    /* Welcome Screen */
     .welcome-container { text-align: center; margin-top: 50px; color: #888; }
     .welcome-container h1 { color: #A855F7; font-size: 3em; }
 </style>
@@ -86,6 +87,22 @@ def ambil_teks_dari_url(url):
         return text[:15000]
     except Exception as e:
         return f"Error: Gagal mengambil teks dari URL. ({e})"
+
+def rekam_suara():
+    fs = 44100
+    seconds = 5
+    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1, dtype='int16')
+    sd.wait()
+    write('temp_audio.wav', fs, myrecording)
+    
+    r = sr.Recognizer()
+    with sr.AudioFile('temp_audio.wav') as source:
+        audio_data = r.record(source)
+    try:
+        teks = r.recognize_google(audio_data, language="id-ID")
+        return teks
+    except:
+        return None
 
 # ===== FUNGSI BANTU =====
 def bikin_chat_baru():
@@ -214,25 +231,31 @@ else:
     # Tampilkan history
     for p in chat["messages"]:
         if p["role"] == "system": continue
-        
-        # Konversi Markdown ke HTML biar render rumus & teks lebih rapi
         teks_html = markdown.markdown(p["content"])
-        
         if p["role"] == "user":
             st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="chat-ai"><div class="avatar">🤖</div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# Input user
-user = st.chat_input("Ketik pesan...")
+# Input user dengan tombol mikrofon
+col1, col2 = st.columns([8, 1])
+with col1:
+    user = st.chat_input("Ketik pesan...")
+with col2:
+    if st.button("🎤", help="Rekam suara (5 detik)"):
+        with st.spinner("Merekam..."):
+            hasil_suara = rekam_suara()
+            if hasil_suara:
+                user = hasil_suara
+                st.success(f"Kamu bilang: {user}")
+            else:
+                st.error("Gagal mendengar suara. Coba lagi.")
 
 if user:
     if len(chat["messages"]) == 1:
         chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
     
     chat["messages"].append({"role": "user", "content": user})
-    
-    # Render pesan user pakai markdown
     teks_html_user = markdown.markdown(user)
     st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html_user}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
 
