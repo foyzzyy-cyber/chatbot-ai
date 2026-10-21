@@ -5,6 +5,3 @@ pypdf
 requests
 beautifulsoup4
 markdown
-sounddevice
-scipy
-SpeechRecognition
