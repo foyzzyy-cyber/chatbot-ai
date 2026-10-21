@@ -7,6 +7,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import markdown
+import sqlite3
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -42,7 +43,41 @@ if not st.user.is_logged_in:
 user_email = st.user.email
 folder_user = f"data_{user_email.replace('@', '_').replace('.', '_')}"
 os.makedirs(folder_user, exist_ok=True)
-FILE_DB = os.path.join(folder_user, "chats.json")
+
+# ===== SETUP DATABASE SQLITE =====
+DB_PATH = os.path.join(folder_user, "chat_history.db")
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS conversations
+                 (id TEXT PRIMARY KEY, title TEXT, messages TEXT)''')
+    conn.commit()
+    conn.close()
+
+def simpan_ke_db(chat_id, title, messages):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    messages_json = json.dumps(messages, ensure_ascii=False)
+    c.execute("INSERT OR REPLACE INTO conversations (id, title, messages) VALUES (?, ?, ?)",
+              (chat_id, title, messages_json))
+    conn.commit()
+    conn.close()
+
+def muat_dari_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, title, messages FROM conversations")
+    rows = c.fetchall()
+    conn.close()
+    
+    data = {}
+    for row in rows:
+        data[row[0]] = {"title": row[1], "messages": json.loads(row[2])}
+    return data
+
+# Panggil inisialisasi saat pertama kali jalan
+init_db()
 
 # Daftar kepribadian AI
 PERSONAS = {
@@ -57,14 +92,11 @@ def get_system_prompt():
 
 # ===== FUNGSI SIMPAN & MUAT =====
 def simpan_ke_file():
-    with open(FILE_DB, "w", encoding="utf-8") as f:
-        json.dump(st.session_state.conversations, f, ensure_ascii=False, indent=2)
+    for chat_id, chat_data in st.session_state.conversations.items():
+        simpan_ke_db(chat_id, chat_data["title"], chat_data["messages"])
 
 def muat_dari_file():
-    if os.path.exists(FILE_DB):
-        with open(FILE_DB, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return None
+    return muat_dari_db()
 
 def extract_text_from_pdf(file):
     reader = PdfReader(file)
