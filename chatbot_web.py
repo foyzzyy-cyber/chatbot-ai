@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import markdown
 import sqlite3
+import base64
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -17,16 +18,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ===== FUNGSI BUAT NGELOAD GAMBAR AVATAR =====
+def get_image_base64(path):
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except FileNotFoundError:
+        return "" # Kalau gambar nggak ada, balikin kosong
+
+user_avatar_b64 = get_image_base64("user_avatar.png")
+bot_avatar_b64 = get_image_base64("bot_avatar.png")
+
 # ===== CSS CUSTOM =====
-st.markdown("""
+st.markdown(f"""
 <style>
-    .chat-user { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
-    .chat-user .bubble { background-color: #A855F7; color: white; padding: 10px 15px; border-radius: 15px 15px 0px 15px; max-width: 75%; }
-    .chat-ai { display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 15px; }
-    .chat-ai .bubble { background-color: #2D2D2D; color: #E0E0E0; padding: 10px 15px; border-radius: 15px 15px 15px 0px; max-width: 75%; }
-    .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #444; }
-    .welcome-container { text-align: center; margin-top: 50px; color: #888; }
-    .welcome-container h1 { color: #A855F7; font-size: 3em; }
+    .chat-user {{ display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; align-items: flex-start; }}
+    .chat-user .bubble {{ background-color: #A855F7; color: white; padding: 10px 15px; border-radius: 15px 15px 0px 15px; max-width: 75%; }}
+    .chat-ai {{ display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 15px; align-items: flex-start; }}
+    .chat-ai .bubble {{ background-color: #2D2D2D; color: #E0E0E0; padding: 10px 15px; border-radius: 15px 15px 15px 0px; max-width: 75%; }}
+    
+    .avatar {{ width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #444; background-size: cover; background-position: center; }}
+    
+    .welcome-container {{ text-align: center; margin-top: 50px; color: #888; }}
+    .welcome-container h1 {{ color: #A855F7; font-size: 3em; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -76,7 +90,6 @@ def muat_dari_db():
         data[row[0]] = {"title": row[1], "messages": json.loads(row[2])}
     return data
 
-# Panggil inisialisasi saat pertama kali jalan
 init_db()
 
 # Daftar kepribadian AI
@@ -144,7 +157,12 @@ if "current_id" not in st.session_state:
 # ===== SIDEBAR =====
 with st.sidebar:
     st.title("💬 Percakapan")
-    st.caption(f"Login: **{user_email}**")
+    
+    # Tampilkan foto profil user (kalau ada)
+    if user_avatar_b64:
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div><span>{user_email}</span></div>', unsafe_allow_html=True)
+    else:
+        st.caption(f"Login: **{user_email}**")
     
     if st.button("Logout", use_container_width=True):
         st.logout()
@@ -245,10 +263,16 @@ else:
     for p in chat["messages"]:
         if p["role"] == "system": continue
         teks_html = markdown.markdown(p["content"])
+        
+        # Pakai gambar avatar kalau ada, kalau nggak ada pakai emoji
         if p["role"] == "user":
-            st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
+            avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
+            avatar_content = '' if user_avatar_b64 else '🧑'
+            st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html}</div><div class="avatar" {avatar_style}>{avatar_content}</div></div>', unsafe_allow_html=True)
         else:
-            st.markdown(f'<div class="chat-ai"><div class="avatar">🤖</div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+            avatar_style = f'style="background-image: url(data:image/png;base64,{bot_avatar_b64});"' if bot_avatar_b64 else ''
+            avatar_content = '' if bot_avatar_b64 else '🤖'
+            st.markdown(f'<div class="chat-ai"><div class="avatar" {avatar_style}>{avatar_content}</div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
 # Input user
 user = st.chat_input("Ketik pesan...")
@@ -259,7 +283,9 @@ if user:
     
     chat["messages"].append({"role": "user", "content": user})
     teks_html_user = markdown.markdown(user)
-    st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html_user}</div><div class="avatar">🧑</div></div>', unsafe_allow_html=True)
+    avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
+    avatar_content = '' if user_avatar_b64 else '🧑'
+    st.markdown(f'<div class="chat-user"><div class="bubble">{teks_html_user}</div><div class="avatar" {avatar_style}>{avatar_content}</div></div>', unsafe_allow_html=True)
 
     with st.spinner("AI sedang mengetik..."):
         try:
