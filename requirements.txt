@@ -1,8 +1,10 @@
-streamlit
-groq
-pypdf
 streamlit[auth]
 httpx
+groq
+pypdf
 requests
 beautifulsoup4
 markdown
+sounddevice
+scipy
+SpeechRecognition
