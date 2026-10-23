@@ -38,13 +38,25 @@ st.markdown(f"""
     
     .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #0B0F19 100%); }}
     
-    /* Paksa Sidebar Tampil */
+    /* 1. PAKSA SIDEBAR TAMPIL */
     [data-testid="stSidebar"] {{ 
         background-color: #111827 !important; 
         border-right: 1px solid #1F2937;
         display: block !important;
+        min-width: 300px !important;
     }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
+
+    /* 2. PAKSA CHAT INPUT KE BAWAH */
+    .stChatInput {{
+        position: fixed !important;
+        bottom: 20px !important;
+        left: 320px !important; 
+        right: 400px !important; 
+        z-index: 9999 !important;
+        background: #0B0F19 !important;
+        padding: 10px !important;
+    }}
 
     /* Chat Bubble Custom */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
@@ -67,10 +79,6 @@ st.markdown(f"""
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(124,58,237,0.2) 0%, rgba(17,24,39,0) 100%); border-radius: 20px; margin-bottom: 20px; }}
     .ai-avatar-big {{ width: 100px; height: 100px; background: #1E293B; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #7C3AED; box-shadow: 0 0 20px rgba(124,58,237,0.5); }}
     .capability-item {{ display: flex; align-items: center; padding: 10px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }}
-    
-    /* Input Chat di Bawah */
-    .main .block-container {{ padding-bottom: 100px; }}
-    [data-testid="stChatInput"] {{ background: transparent; }}
 </style>
 """, unsafe_allow_html=True)
 
