@@ -29,17 +29,15 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN (KONTRAS TINGGI & INPUT CHAT DI BAWAH) =====
+# ===== CSS MODERN =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
-    /* 1. BACKGROUND LEBIH GELAP (HAMPIR HITAM) */
     .stApp {{ background: #06080E; }}
     
-    /* 2. SIDEBAR LEBIH KONTRAS */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
@@ -47,7 +45,6 @@ st.markdown(f"""
     }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
 
-    /* 3. PINDAHIN INPUT CHAT KE PALING BAWAH */
     [data-testid="stChatInput"] {{
         position: fixed !important;
         bottom: 0px !important;
@@ -58,13 +55,11 @@ st.markdown(f"""
         z-index: 9999 !important;
         border-top: 1px solid #1F2937;
     }}
-    /* Geser input biar sejajar sama chat (nggak nabrak sidebar) */
     .stChatInput {{
         padding-left: 320px !important; 
         padding-right: 400px !important;
     }}
 
-    /* 4. CHAT BUBBLE DENGAN EFEK NEON LEBIH TEBAL */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
@@ -85,7 +80,6 @@ st.markdown(f"""
     }}
     .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
-    /* 5. PANEL KANAN (KARTU AI) */
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
     .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
     
@@ -203,14 +197,34 @@ with st.sidebar:
 col_chat, col_right = st.columns([2.5, 1])
 
 with col_right:
+    # Panel Profil AI
     st.markdown("""
     <div class="ai-profile">
         <div class="ai-avatar-big">🤖</div>
         <h3 style="margin:0; color:white;">AI Assistant</h3>
         <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu 24/7</p>
     </div>
-    <p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>
     """, unsafe_allow_html=True)
+
+    # FITUR UPLOAD PDF DI PANEL KANAN
+    st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
+    
+    if uploaded_file is not None:
+        if st.button("Proses PDF", use_container_width=True, type="primary"):
+            with st.spinner("Membaca PDF..."):
+                pdf_text = extract_text_from_pdf(uploaded_file)
+                chat_aktif = ambil_chat_aktif()
+                chat_aktif["messages"].append({
+                    "role": "system", 
+                    "content": f"Gunakan informasi dari dokumen berikut untuk menjawab pertanyaan user:\n\n{pdf_text[:10000]}" 
+                })
+                simpan_ke_file()
+                st.success("PDF berhasil diproses!")
+                st.rerun()
+
+    st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>", unsafe_allow_html=True)
     
     fitur = [("💬", "Tanya Jawab", "Dapatkan jawaban cepat"), ("📄", "Rangkuman", "Ringkas informasi panjang"), ("💡", "Kreativitas", "Ide, tulisan, dan konsep"), ("💻", "Pemrograman", "Bantuan coding dan debugging"), ("📚", "Belajar", "Jelaskan topik apa saja")]
     for icon, title, desc in fitur:
