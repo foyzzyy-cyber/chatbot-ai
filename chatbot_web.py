@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="AI Portofolio",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # ===== FUNGSI AVATAR =====
@@ -30,7 +30,7 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN =====
+# ===== CSS MODERN (PAKSA SIDEBAR MUNCUL) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -39,8 +39,14 @@ st.markdown(f"""
     
     .stApp {{ background: #06080E; }}
     
-    /* Sembunyiin sidebar bawaan */
-    [data-testid="stSidebar"] {{ display: none !important; }}
+    /* PAKSA SIDEBAR MUNCUL & RAPI */
+    [data-testid="stSidebar"] {{ 
+        background-color: #0B0F19 !important; 
+        border-right: 1px solid #1F2937;
+        display: block !important;
+        min-width: 300px !important;
+        max-width: 300px !important;
+    }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
 
     [data-testid="stChatInput"] {{
@@ -54,8 +60,8 @@ st.markdown(f"""
         border-top: 1px solid #1F2937;
     }}
     .stChatInput {{
-        padding-left: 50px !important; 
-        padding-right: 400px !important;
+        padding-left: 320px !important; 
+        padding-right: 50px !important;
     }}
 
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
@@ -77,12 +83,6 @@ st.markdown(f"""
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }}
     .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
-
-    .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
-    .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
-    
-    .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
-    .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -171,32 +171,49 @@ def render_pesan(teks, is_user=False):
     else:
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# ===== LAYOUT UTAMA (2 KOLOM) =====
-col_chat, col_right = st.columns([2.5, 1])
-
-with col_right:
-    # Tombol Navigasi (di atas panel kanan)
+# ===== SIDEBAR KIRI (MENU NAVIGASI) =====
+with st.sidebar:
+    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
+    
+    if user_avatar_b64:
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
+    
+    # Menu Navigasi
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
     if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.menu == "chat" else "secondary"):
         st.session_state.menu = "chat"; st.rerun()
+        
     if st.button("👨‍💻 Tentang Pembuat", use_container_width=True, type="primary" if st.session_state.menu == "about" else "secondary"):
         st.session_state.menu = "about"; st.rerun()
-    
-    st.markdown("<hr style='border-color:#1F2937; margin:10px 0;'>", unsafe_allow_html=True)
-
-    if st.session_state.menu == "chat":
-        st.markdown("""
-        <div class="ai-profile">
-            <div class="ai-avatar-big">🤖</div>
-            <h3 style="margin:0; color:white;">AI Assistant</h3>
-            <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu 24/7</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
         
+    if st.button("➕ Chat Baru", use_container_width=True):
+        bikin_chat_baru(); st.session_state.menu = "chat"; st.rerun()
+        
+    st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
+    
+    # History Chat cuma muncul kalau lagi di menu chat
+    if st.session_state.menu == "chat":
+        st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 History</p>", unsafe_allow_html=True)
+        for chat_id, chat_data in st.session_state.conversations.items():
+            is_active = (chat_id == st.session_state.current_id)
+            label = f"{'🟢 ' if is_active else '▫️ '}{chat_data['title']}"
+            if st.button(label, key=f"chat_{chat_id}", use_container_width=True):
+                st.session_state.current_id = chat_id; st.rerun()
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.selectbox("Pilih Kepribadian:", list(PERSONAS.keys()), key="persona")
+    
+    if st.button("Logout", use_container_width=True): st.logout()
+
+# ===== KONTEN UTAMA =====
+if st.session_state.menu == "chat":
+    # Tampilan Chat
+    st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
+
+    # Fitur Upload PDF (di atas chat)
+    with st.expander("📄 Upload Dokumen PDF"):
+        uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
         if uploaded_file is not None:
             if st.button("Proses PDF", use_container_width=True, type="primary"):
                 with st.spinner("Membaca PDF..."):
@@ -207,67 +224,56 @@ with col_right:
                     st.success("PDF berhasil diproses!")
                     st.rerun()
 
-        st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>", unsafe_allow_html=True)
+    chat = ambil_chat_aktif()
+    if chat["messages"][0]["role"] == "system": chat["messages"][0]["content"] = get_system_prompt()
+
+    for p in chat["messages"]:
+        if p["role"] == "system": continue
+        render_pesan(p["content"], is_user=(p["role"] == "user"))
+
+    user = st.chat_input("Ketik pesan Anda di sini...")
+
+    if user:
+        if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
+        chat["messages"].append({"role": "user", "content": user})
+        render_pesan(user, is_user=True)
+
+        with st.spinner(""):
+            try:
+                stream = client.chat.completions.create(model="openai/gpt-oss-120b", messages=chat["messages"], stream=True)
+                def generate_chunks():
+                    for chunk in stream:
+                        if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content: yield chunk.choices[0].delta.content
+                jawab = st.write_stream(generate_chunks())
+                if jawab:
+                    chat["messages"].append({"role": "assistant", "content": jawab})
+                    simpan_ke_file(); st.rerun()
+            except Exception as e: st.error(f"⚠️ Error: {e}")
+
+elif st.session_state.menu == "about":
+    # Tampilan Tentang Pembuat
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center; margin-top: 20px;">
         
-        fitur = [("💬", "Tanya Jawab", "Dapatkan jawaban cepat"), ("📄", "Rangkuman", "Ringkas informasi panjang"), ("💡", "Kreativitas", "Ide, tulisan, dan konsep"), ("💻", "Pemrograman", "Bantuan coding dan debugging"), ("📚", "Belajar", "Jelaskan topik apa saja")]
-        for icon, title, desc in fitur:
-            st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
-
-# ===== KONTEN TENGAH =====
-with col_chat:
-    if st.session_state.menu == "chat":
-        st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
-
-        chat = ambil_chat_aktif()
-        if chat["messages"][0]["role"] == "system": chat["messages"][0]["content"] = get_system_prompt()
-
-        for p in chat["messages"]:
-            if p["role"] == "system": continue
-            render_pesan(p["content"], is_user=(p["role"] == "user"))
-
-        user = st.chat_input("Ketik pesan Anda di sini...")
-
-        if user:
-            if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
-            chat["messages"].append({"role": "user", "content": user})
-            render_pesan(user, is_user=True)
-
-            with st.spinner(""):
-                try:
-                    stream = client.chat.completions.create(model="openai/gpt-oss-120b", messages=chat["messages"], stream=True)
-                    def generate_chunks():
-                        for chunk in stream:
-                            if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content: yield chunk.choices[0].delta.content
-                    jawab = st.write_stream(generate_chunks())
-                    if jawab:
-                        chat["messages"].append({"role": "assistant", "content": jawab})
-                        simpan_ke_file(); st.rerun()
-                except Exception as e: st.error(f"⚠️ Error: {e}")
-                
-    elif st.session_state.menu == "about":
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center; margin-top: 50px;">
-            
-            <div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">
-                🧑‍💻
-            </div>
-            
-            <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmialiah</h1>
-            <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
-            
-            <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
-                Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://linkedin.com/in/usernamekamu" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">💼</span> LinkedIn Saya
-                </a>
-            </div>
+        <div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">
+            🧑‍💻
         </div>
-        """, unsafe_allow_html=True)
+        
+        <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmialiah</h1>
+        <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
+        
+        <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
+            Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
+            Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
+        </p>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <span style="font-size: 20px;">🐙</span> GitHub Saya
+            </a>
+            <a href="https://linkedin.com/in/usernamekamu" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <span style="font-size: 20px;">💼</span> LinkedIn Saya
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
