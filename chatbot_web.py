@@ -273,13 +273,13 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ===== KONTEN UTAMA =====
-if st.session_state.get("menu") == "about":
+elif st.session_state.get("menu") == "about":
     if foto_profil_b64:
         foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
     else:
         foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
 
-    st.markdown(f"""
+    html_content = f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
             
@@ -303,7 +303,8 @@ if st.session_state.get("menu") == "about":
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    components.html(html_content, height=600, scrolling=True)
     
     if st.button("⬅️ Kembali ke Chat", use_container_width=True):
         st.session_state.menu = "chat"; st.rerun()
