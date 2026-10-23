@@ -277,7 +277,6 @@ if st.session_state.menu == "chat":
                 except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
-    # ===== TAMPILAN TENTANG PEMBUAT (PAKAI COMPONENTS.HTML) =====
     if foto_profil_b64:
         foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
     else:
@@ -289,7 +288,7 @@ elif st.session_state.menu == "about":
             
             {foto_html}
             
-            <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmialiah</h1>
+            <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmiallah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
             
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
@@ -301,7 +300,7 @@ elif st.session_state.menu == "about":
                 <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
                     <span style="font-size: 20px;">🐙</span> GitHub Saya
                 </a>
-                <a href="https://linkedin.com/in/usernamekamu" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <a href="https://www.linkedin.com/in/revaldi-syahmiallah/" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
                     <span style="font-size: 20px;">💼</span> LinkedIn Saya
                 </a>
             </div>
