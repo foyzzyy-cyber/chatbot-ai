@@ -15,7 +15,7 @@ import markdown
 st.set_page_config(
     page_title="AI Portofolio",
     page_icon="🤖",
-    layout="wide",
+    layout="centered", # <--- BALIK KE CENTERED (BIAR SIDEBAR MUNCUL)
     initial_sidebar_state="expanded"
 )
 
@@ -30,7 +30,7 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN (PAKSA SIDEBAR MUNCUL) =====
+# ===== CSS MODERN =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -39,16 +39,13 @@ st.markdown(f"""
     
     .stApp {{ background: #06080E; }}
     
-    /* PAKSA SIDEBAR MUNCUL & RAPI */
+    /* Sidebar Kiri */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
-        display: block !important;
-        min-width: 300px !important;
-        max-width: 300px !important;
     }}
-    [data-testid="collapsedControl"] {{ display: none !important; }}
 
+    /* Chat Input di Bawah */
     [data-testid="stChatInput"] {{
         position: fixed !important;
         bottom: 0px !important;
@@ -171,7 +168,7 @@ def render_pesan(teks, is_user=False):
     else:
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# ===== SIDEBAR KIRI (MENU NAVIGASI) =====
+# ===== SIDEBAR KIRI =====
 with st.sidebar:
     st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
@@ -179,21 +176,18 @@ with st.sidebar:
     if user_avatar_b64:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
     
-    # Menu Navigasi
+    # Navigasi
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
     if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.menu == "chat" else "secondary"):
         st.session_state.menu = "chat"; st.rerun()
-        
     if st.button("👨‍💻 Tentang Pembuat", use_container_width=True, type="primary" if st.session_state.menu == "about" else "secondary"):
         st.session_state.menu = "about"; st.rerun()
-        
     if st.button("➕ Chat Baru", use_container_width=True):
         bikin_chat_baru(); st.session_state.menu = "chat"; st.rerun()
         
     st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
     
-    # History Chat cuma muncul kalau lagi di menu chat
     if st.session_state.menu == "chat":
         st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 History</p>", unsafe_allow_html=True)
         for chat_id, chat_data in st.session_state.conversations.items():
@@ -208,10 +202,9 @@ with st.sidebar:
 
 # ===== KONTEN UTAMA =====
 if st.session_state.menu == "chat":
-    # Tampilan Chat
     st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
 
-    # Fitur Upload PDF (di atas chat)
+    # Fitur PDF
     with st.expander("📄 Upload Dokumen PDF"):
         uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
         if uploaded_file is not None:
@@ -251,7 +244,6 @@ if st.session_state.menu == "chat":
             except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
-    # Tampilan Tentang Pembuat
     st.markdown("""
     <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center; margin-top: 20px;">
         
