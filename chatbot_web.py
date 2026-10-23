@@ -113,7 +113,8 @@ if not is_logged_in:
             margin: 0;
             padding: 0;
             height: 100vh;
-            background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%);
+            /* Warna background lebih gelap & biru */
+            background: radial-gradient(circle at 0% 0%, #0B132B 0%, #02040A 100%);
             font-family: 'Inter', sans-serif;
             color: white;
             display: flex;
@@ -145,7 +146,7 @@ if not is_logged_in:
             margin-bottom: 40px;
         }}
         .logo-icon {{
-            color: #60A5FA;
+            color: #3B82F6; /* Biru lebih terang */
             font-size: 32px;
         }}
         h1 {{
@@ -155,7 +156,8 @@ if not is_logged_in:
             margin-bottom: 20px;
         }}
         .gradient-text {{
-            background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
+            /* Warna gradient ungu lebih pekat */
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
@@ -181,11 +183,11 @@ if not is_logged_in:
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(37, 99, 235, 0.1);
+            background: rgba(59, 130, 246, 0.1); /* Biru transparan */
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #60A5FA;
+            color: #3B82F6;
         }}
         .right-panel {{
             flex: 1;
@@ -195,14 +197,14 @@ if not is_logged_in:
             z-index: 2;
         }}
         .login-card {{
-            background: rgba(17, 24, 39, 0.4);
+            background: rgba(15, 23, 42, 0.6); /* Warna slate gelap */
             backdrop-filter: blur(30px);
             border-radius: 30px;
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(37, 99, 235, 0.1), inset 0 0 20px rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2); /* Border biru */
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.15), inset 0 0 20px rgba(37, 99, 235, 0.05);
             text-align: center;
             position: relative;
         }}
@@ -210,23 +212,25 @@ if not is_logged_in:
             content: "";
             position: absolute;
             top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, #60A5FA, #A855F7, #60A5FA);
+            /* Efek glow biru-ungu */
+            background: linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6);
             border-radius: 32px;
             z-index: -1;
-            opacity: 0.3;
-            filter: blur(10px);
+            opacity: 0.4;
+            filter: blur(15px);
         }}
         .card-icon {{
             width: 60px;
             height: 60px;
-            background: rgba(37, 99, 235, 0.2);
+            background: rgba(59, 130, 246, 0.2);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px auto;
             font-size: 30px;
-            color: #60A5FA;
+            color: #3B82F6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }}
         .login-card h2 {{
             font-size: 24px;
@@ -263,11 +267,11 @@ if not is_logged_in:
         }}
         .btn-guest {{
             background: transparent;
-            color: #60A5FA;
-            border: 1px solid #60A5FA;
+            color: #3B82F6;
+            border: 1px solid #3B82F6;
         }}
         .btn-guest:hover {{
-            background: rgba(96, 165, 250, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }}
         .divider {{
@@ -289,7 +293,7 @@ if not is_logged_in:
             color: #6B7280;
             margin-top: 20px;
         }}
-        .footer-text a {{ color: #60A5FA; text-decoration: none; }}
+        .footer-text a {{ color: #3B82F6; text-decoration: none; }}
     </style>
     </head>
     <body>
@@ -562,20 +566,4 @@ elif st.session_state.menu == "about":
             <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmaliah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
             
-            <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
-                Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+            <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8
