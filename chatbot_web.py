@@ -100,13 +100,16 @@ is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
     # === HALAMAN LOGIN MODERN (HTML/CSS MURNI) ===
-    html_login = """
+    # Logo Google pakai SVG biar pasti muncul
+    google_svg = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
+    
+    html_login = f"""
     <!DOCTYPE html>
     <html>
     <head>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body {
+        body {{
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -117,8 +120,8 @@ if not is_logged_in:
             align-items: center;
             justify-content: center;
             overflow: hidden;
-        }
-        .container {
+        }}
+        .container {{
             display: flex;
             width: 90%;
             max-width: 1100px;
@@ -126,55 +129,55 @@ if not is_logged_in:
             align-items: center;
             position: relative;
             z-index: 10;
-        }
-        .left-panel {
+        }}
+        .left-panel {{
             flex: 1;
             padding-right: 50px;
             position: relative;
             z-index: 2;
-        }
-        .logo {
+        }}
+        .logo {{
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 24px;
             font-weight: 800;
             margin-bottom: 40px;
-        }
-        .logo-icon {
+        }}
+        .logo-icon {{
             color: #60A5FA;
             font-size: 32px;
-        }
-        h1 {
+        }}
+        h1 {{
             font-size: 48px;
             font-weight: 800;
             line-height: 1.2;
             margin-bottom: 20px;
-        }
-        .gradient-text {
+        }}
+        .gradient-text {{
             background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-        p.subtitle {
+        }}
+        p.subtitle {{
             color: #9CA3AF;
             font-size: 18px;
             margin-bottom: 40px;
             max-width: 400px;
-        }
-        .features {
+        }}
+        .features {{
             display: flex;
             flex-direction: column;
             gap: 20px;
-        }
-        .feature-item {
+        }}
+        .feature-item {{
             display: flex;
             align-items: center;
             gap: 15px;
             font-size: 16px;
             font-weight: 500;
-        }
-        .feature-icon {
+        }}
+        .feature-icon {{
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -183,15 +186,15 @@ if not is_logged_in:
             align-items: center;
             justify-content: center;
             color: #60A5FA;
-        }
-        .right-panel {
+        }}
+        .right-panel {{
             flex: 1;
             display: flex;
             justify-content: flex-end;
             position: relative;
             z-index: 2;
-        }
-        .login-card {
+        }}
+        .login-card {{
             background: rgba(17, 24, 39, 0.4);
             backdrop-filter: blur(30px);
             border-radius: 30px;
@@ -202,8 +205,8 @@ if not is_logged_in:
             box-shadow: 0 0 40px rgba(37, 99, 235, 0.1), inset 0 0 20px rgba(37, 99, 235, 0.05);
             text-align: center;
             position: relative;
-        }
-        .login-card::before {
+        }}
+        .login-card::before {{
             content: "";
             position: absolute;
             top: -2px; left: -2px; right: -2px; bottom: -2px;
@@ -212,8 +215,8 @@ if not is_logged_in:
             z-index: -1;
             opacity: 0.3;
             filter: blur(10px);
-        }
-        .card-icon {
+        }}
+        .card-icon {{
             width: 60px;
             height: 60px;
             background: rgba(37, 99, 235, 0.2);
@@ -224,17 +227,17 @@ if not is_logged_in:
             margin: 0 auto 20px auto;
             font-size: 30px;
             color: #60A5FA;
-        }
-        .login-card h2 {
+        }}
+        .login-card h2 {{
             font-size: 24px;
             margin-bottom: 10px;
-        }
-        .login-card p {
+        }}
+        .login-card p {{
             color: #9CA3AF;
             font-size: 14px;
             margin-bottom: 30px;
-        }
-        .btn {
+        }}
+        .btn {{
             display: flex;
             align-items: center;
             justify-content: center;
@@ -248,49 +251,45 @@ if not is_logged_in:
             transition: all 0.3s ease;
             text-decoration: none;
             margin-bottom: 20px;
-        }
-        .btn-google {
+        }}
+        .btn-google {{
             background: white;
             color: #000;
             border: none;
-        }
-        .btn-google:hover {
+        }}
+        .btn-google:hover {{
             background: #E5E7EB;
             transform: translateY(-2px);
-        }
-        .btn-google img {
-            width: 20px;
-            height: 20px;
-        }
-        .btn-guest {
+        }}
+        .btn-guest {{
             background: transparent;
             color: #60A5FA;
             border: 1px solid #60A5FA;
-        }
-        .btn-guest:hover {
+        }}
+        .btn-guest:hover {{
             background: rgba(96, 165, 250, 0.1);
             transform: translateY(-2px);
-        }
-        .divider {
+        }}
+        .divider {{
             display: flex;
             align-items: center;
             text-align: center;
             color: #4B5563;
             margin: 20px 0;
-        }
-        .divider::before, .divider::after {
+        }}
+        .divider::before, .divider::after {{
             content: '';
             flex: 1;
             border-bottom: 1px solid #1F2937;
-        }
-        .divider:not(:empty)::before { margin-right: 15px; }
-        .divider:not(:empty)::after { margin-left: 15px; }
-        .footer-text {
+        }}
+        .divider:not(:empty)::before {{ margin-right: 15px; }}
+        .divider:not(:empty)::after {{ margin-left: 15px; }}
+        .footer-text {{
             font-size: 12px;
             color: #6B7280;
             margin-top: 20px;
-        }
-        .footer-text a { color: #60A5FA; text-decoration: none; }
+        }}
+        .footer-text a {{ color: #60A5FA; text-decoration: none; }}
     </style>
     </head>
     <body>
@@ -323,7 +322,7 @@ if not is_logged_in:
                     
                     <form action="" method="get">
                         <button class="btn btn-google" name="login_google">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G"> 
+                            {google_svg} 
                             Lanjutkan dengan Google
                         </button>
                         
@@ -565,18 +564,4 @@ elif st.session_state.menu == "about":
             
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
                 Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggab
