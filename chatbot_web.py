@@ -31,37 +31,23 @@ user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# ===== CSS MODERN =====
+# ===== CSS MODERN (Tema Gelap & Neon) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
-    .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
+    /* Background Utama */
+    .stApp {{ background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%); }}
     
+    /* Styling Sidebar */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
-        display: block !important;
-    }}
-    [data-testid="collapsedControl"] {{ display: none !important; }}
-
-    [data-testid="stChatInput"] {{
-        position: fixed !important;
-        bottom: 0px !important;
-        left: 0px !important;
-        width: 100% !important;
-        background: #06080E !important;
-        padding: 15px 20px !important;
-        z-index: 9999 !important;
-        border-top: 1px solid #1F2937;
-    }}
-    .stChatInput {{
-        padding-left: 320px !important; 
-        padding-right: 400px !important;
     }}
 
+    /* Styling Kotak Chat */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
@@ -82,11 +68,25 @@ st.markdown(f"""
     }}
     .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
+    /* Styling Panel Kanan */
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
     .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
+
+    /* Styling Halaman Login Modern */
+    .login-container {{ text-align: center; margin-top: 10vh; }}
+    .login-title {{
+        background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(37,99,235,0.5);
+    }}
+    .login-subtitle {{ color: #9CA3AF; font-size: 16px; margin-bottom: 40px; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -98,12 +98,19 @@ is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
-    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 Rval AI</h1><p>Silakan login atau masuk sebagai tamu.</p></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1,1,1])
+    # Tampilan Login Modern (Tapi Tombol Asli Streamlit)
+    st.markdown("""
+    <div class="login-container">
+        <div class="login-title">Rval AI</div>
+        <div class="login-subtitle">Temukan cara baru untuk berpikir.</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,1.5,1])
     with col2:
-        if st.button("Login with Google", type="primary", use_container_width=True):
+        if st.button("🚀 Login with Google", type="primary", use_container_width=True):
             st.login()
-        if st.button("Login sebagai Tamu", use_container_width=True):
+        if st.button("👤 Masuk sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
     st.stop()
@@ -201,8 +208,10 @@ with st.sidebar:
     else:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background:#1E293B; border: 2px solid #3B82F6; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     
+    if "menu" not in st.session_state: st.session_state.menu = "chat"
+    
     if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
-        bikin_chat_baru(); st.rerun()
+        bikin_chat_baru(); st.session_state.menu = "chat"; st.rerun()
         
     if st.button("👨‍💻 Tentang Pembuat", use_container_width=True, type="secondary"):
         st.session_state.menu = "about"; st.rerun()
@@ -210,7 +219,6 @@ with st.sidebar:
     st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
     st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 Chat</p>", unsafe_allow_html=True)
     
-    if "menu" not in st.session_state: st.session_state.menu = "chat"
     if st.session_state.menu == "chat":
         for chat_id, chat_data in st.session_state.conversations.items():
             is_active = (chat_id == st.session_state.current_id)
