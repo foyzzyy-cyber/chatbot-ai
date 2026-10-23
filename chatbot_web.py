@@ -273,7 +273,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ===== KONTEN UTAMA =====
-elif st.session_state.get("menu") == "about":
+if st.session_state.get("menu") == "about":
     if foto_profil_b64:
         foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
     else:
