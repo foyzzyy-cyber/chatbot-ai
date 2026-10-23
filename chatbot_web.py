@@ -100,7 +100,6 @@ is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
     # === HALAMAN LOGIN MODERN (HTML/CSS MURNI) ===
-    # Logo Google pakai SVG biar pasti muncul
     google_svg = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
     
     html_login = f"""
@@ -113,8 +112,8 @@ if not is_logged_in:
             margin: 0;
             padding: 0;
             height: 100vh;
-            /* Warna background lebih gelap & biru */
-            background: radial-gradient(circle at 0% 0%, #0B132B 0%, #02040A 100%);
+            /* Background lebih gelap & biru pekat */
+            background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%);
             font-family: 'Inter', sans-serif;
             color: white;
             display: flex;
@@ -146,7 +145,7 @@ if not is_logged_in:
             margin-bottom: 40px;
         }}
         .logo-icon {{
-            color: #3B82F6; /* Biru lebih terang */
+            color: #3B82F6;
             font-size: 32px;
         }}
         h1 {{
@@ -156,8 +155,7 @@ if not is_logged_in:
             margin-bottom: 20px;
         }}
         .gradient-text {{
-            /* Warna gradient ungu lebih pekat */
-            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
@@ -183,7 +181,7 @@ if not is_logged_in:
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(59, 130, 246, 0.1); /* Biru transparan */
+            background: rgba(59, 130, 246, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -197,26 +195,28 @@ if not is_logged_in:
             z-index: 2;
         }}
         .login-card {{
-            background: rgba(15, 23, 42, 0.6); /* Warna slate gelap */
+            /* Background kaca transparan */
+            background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(30px);
             border-radius: 30px;
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            border: 1px solid rgba(59, 130, 246, 0.2); /* Border biru */
-            box-shadow: 0 0 40px rgba(37, 99, 235, 0.15), inset 0 0 20px rgba(37, 99, 235, 0.05);
+            /* Border biru tebal */
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 50px rgba(37, 99, 235, 0.2), inset 0 0 20px rgba(37, 99, 235, 0.1);
             text-align: center;
             position: relative;
         }}
+        /* Efek Glow di luar kotak */
         .login-card::before {{
             content: "";
             position: absolute;
             top: -2px; left: -2px; right: -2px; bottom: -2px;
-            /* Efek glow biru-ungu */
             background: linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6);
             border-radius: 32px;
             z-index: -1;
-            opacity: 0.4;
+            opacity: 0.5;
             filter: blur(15px);
         }}
         .card-icon {{
