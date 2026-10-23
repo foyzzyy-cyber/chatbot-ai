@@ -127,11 +127,12 @@ def muat_dari_db():
     return data
 init_db()
 
+# ===== ATURAN PERSONA (BIAR AI NGGAK NGARANG LINK) =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah, santai, dan membantu.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar.",
-    "Koki Profesional": "Kamu adalah koki profesional.",
-    "Programmer Expert": "Kamu adalah senior programmer."
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah, santai, dan membantu. PENTING: Jangan pernah mengarang link YouTube atau URL. Jika user minta rekomendasi video, cukup sebutkan judul dan channel-nya saja tanpa link.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. PENTING: Jangan pernah mengarang link YouTube atau URL.",
+    "Koki Profesional": "Kamu adalah koki profesional. PENTING: Jangan pernah mengarang link YouTube atau URL.",
+    "Programmer Expert": "Kamu adalah senior programmer. PENTING: Jangan pernah mengarang link YouTube atau URL."
 }
 def get_system_prompt(): return PERSONAS[st.session_state.get("persona", "Asisten Ramah")]
 
