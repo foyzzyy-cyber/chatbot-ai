@@ -94,15 +94,15 @@ st.markdown(f"""
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
-# Cek URL param buat login tamu
+# Cek apakah user login (lewat Google atau Tamu)
+is_guest = st.session_state.get("guest_mode", False)
+is_logged_in = st.user.is_logged_in or is_guest
+
+# Fungsi buat nangkep klik tombol tamu dari URL
 if "login_guest" in st.query_params:
     st.session_state.guest_mode = True
     st.query_params.clear()
     st.rerun()
-
-# Cek apakah user login (lewat Google atau Tamu)
-is_guest = st.session_state.get("guest_mode", False)
-is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
     # === HALAMAN LOGIN MODERN (HTML/CSS MURNI) ===
@@ -326,14 +326,16 @@ if not is_logged_in:
                     <h2>Selamat datang kembali 👋</h2>
                     <p>Masuk untuk melanjutkan percakapanmu</p>
                     
-                    <a href="?login_guest=true" target="_self" class="btn btn-google">
+                    <!-- TOMBOL GOOGLE (Link ke Streamlit login) -->
+                    <a href="/?login_google=true" target="_self" class="btn btn-google" onclick="window.top.location.href='/?login_google=true'; return false;">
                         {google_svg} 
                         Lanjutkan dengan Google
                     </a>
                     
                     <div class="divider">atau</div>
                     
-                    <a href="?login_guest=true" target="_self" class="btn btn-guest">
+                    <!-- TOMBOL TAMU (Link ke param login_guest) -->
+                    <a href="/?login_guest=true" target="_self" class="btn btn-guest" onclick="window.top.location.href='/?login_guest=true'; return false;">
                         <span>👤</span> Masuk sebagai tamu
                     </a>
                     
@@ -350,14 +352,10 @@ if not is_logged_in:
     
     components.html(html_login, height=700)
     
-    # Tombol Streamlit (disembunyiin di bawah, dipicu lewat URL param)
-    if "login_guest" in st.query_params:
-        st.session_state.guest_mode = True
-        st.query_params.clear() # Bersihin URL
-        st.rerun()
+    # Handle klik dari URL param
     if "login_google" in st.query_params:
-        st.login()
         st.query_params.clear()
+        st.login()
         
     st.stop()
 
@@ -566,20 +564,4 @@ elif st.session_state.menu == "about":
             <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmaliah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
             
-            <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
-                Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+           
