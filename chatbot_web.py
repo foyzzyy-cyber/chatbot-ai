@@ -616,4 +616,4 @@ elif st.session_state.menu == "about":
             </p>
             
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border
+                <a href="https://github.com/foyzzyy-cyber
