@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from groq import Groq
 import uuid
 import json
@@ -29,7 +30,7 @@ def get_image_base64(path):
 
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
-foto_profil_b64 = get_image_base64("foto_profil.png") # <--- FOTO PROFIL
+foto_profil_b64 = get_image_base64("foto_profil.png")
 
 # ===== CSS MODERN =====
 st.markdown(f"""
@@ -276,13 +277,13 @@ if st.session_state.menu == "chat":
                 except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
-    # Tampilan Tentang Pembuat
+    # ===== TAMPILAN TENTANG PEMBUAT (PAKAI COMPONENTS.HTML) =====
     if foto_profil_b64:
         foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
     else:
         foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
 
-    st.markdown(f"""
+    html_content = f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
             
@@ -306,4 +307,5 @@ elif st.session_state.menu == "about":
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    components.html(html_content, height=600, scrolling=True)
