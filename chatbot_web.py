@@ -32,7 +32,7 @@ user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# ===== CSS MODERN (GLASSMORPHISM & NEON) =====
+# ===== CSS MODERN =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -88,30 +88,6 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
-
-    /* CSS KHUSUS HALAMAN LOGIN */
-    .login-card {{
-        background: rgba(17, 24, 39, 0.6);
-        backdrop-filter: blur(20px);
-        padding: 40px;
-        border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(37, 99, 235, 0.1);
-        text-align: center;
-    }}
-    .login-title {{
-        background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 42px;
-        font-weight: 800;
-        margin-bottom: 10px;
-    }}
-    .login-subtitle {{
-        color: #9CA3AF;
-        font-size: 16px;
-        margin-bottom: 30px;
-    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -123,23 +99,131 @@ is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
-    col1, col2, col3 = st.columns([1, 1.5, 1])
-    with col2:
-        st.markdown("""
-            <div class="login-card">
-                <div style="font-size: 60px; margin-bottom: 20px;">👋</div>
-                <h1 class="login-title">Selamat Datang di Rval AI!</h1>
-                <p class="login-subtitle">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan asisten cerdas.</p>
-            </div>
-        """, unsafe_allow_html=True)
+    # === HALAMAN LOGIN MODERN PAKAI HTML CSS ===
+    html_login = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #06080E;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 50px;
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 50px rgba(37, 99, 235, 0.2);
+            width: 400px;
+        }
+        .glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: #2563EB;
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 50%;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            color: #9CA3AF;
+            font-size: 14px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-google {
+            background: #FFFFFF;
+            color: #000;
+        }
+        .btn-google:hover {
+            background: #E5E7EB;
+            transform: translateY(-2px);
+        }
+        .btn-guest {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+            color: white;
+        }
+        .btn-guest:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+        }
+    </style>
+    </head>
+    <body>
+        <div class="glow"></div>
+        <div class="container">
+            <div class="icon">🤖</div>
+            <h1>Rval AI</h1>
+            <p>Selamat datang! Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan asisten cerdas.</p>
+            
+            <form action="" method="get">
+                <button class="btn btn-google" name="login_google">Login with Google</button>
+                <button class="btn btn-guest" name="login_guest">Login sebagai Tamu</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    """
+    
+    components.html(html_login, height=600)
+    
+    # Tombol Streamlit (disembunyiin di bawah, dipicu lewat URL param)
+    if "login_guest" in st.query_params:
+        st.session_state.guest_mode = True
+        st.query_params.clear() # Bersihin URL
+        st.rerun()
+    if "login_google" in st.query_params:
+        st.login()
+        st.query_params.clear()
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        if st.button("🚀 Login with Google", type="primary", use_container_width=True):
-            st.login()
-        if st.button("👤 Login sebagai Tamu", use_container_width=True):
-            st.session_state.guest_mode = True
-            st.rerun()
     st.stop()
 
 # Setup User Info
