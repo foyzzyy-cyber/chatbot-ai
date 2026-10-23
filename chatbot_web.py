@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import markdown
 import sqlite3
 import base64
+import re
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -197,7 +198,6 @@ with st.sidebar:
 col_chat, col_right = st.columns([2.5, 1])
 
 with col_right:
-    # Panel Profil AI
     st.markdown("""
     <div class="ai-profile">
         <div class="ai-avatar-big">🤖</div>
@@ -206,7 +206,7 @@ with col_right:
     </div>
     """, unsafe_allow_html=True)
 
-    # FITUR UPLOAD PDF DI PANEL KANAN
+    # Upload PDF
     st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
     
@@ -245,7 +245,13 @@ with col_chat:
 
     for p in chat["messages"]:
         if p["role"] == "system": continue
-        teks_html = markdown.markdown(p["content"])
+        
+        # Render Markdown + LaTeX (Rumus)
+        teks_html = markdown.markdown(p["content"], extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        
+        # Ubah link mentah jadi link HTML yang bisa diklik
+        teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
+
         if p["role"] == "user":
             avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
             st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" {avatar_style}></div></div>', unsafe_allow_html=True)
@@ -258,7 +264,10 @@ with col_chat:
     if user:
         if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
         chat["messages"].append({"role": "user", "content": user})
-        teks_html_user = markdown.markdown(user)
+        
+        teks_html_user = markdown.markdown(user, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        teks_html_user = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html_user)
+        
         avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
         st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html_user}</div><div class="avatar" {avatar_style}></div></div>', unsafe_allow_html=True)
 
