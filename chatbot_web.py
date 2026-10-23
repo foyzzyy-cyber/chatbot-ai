@@ -86,6 +86,9 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
+    
+    /* CSS buat ngerapiin render LaTeX */
+    .katex-display {{ margin: 10px 0; overflow-x: auto; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -127,12 +130,12 @@ def muat_dari_db():
     return data
 init_db()
 
-# ===== ATURAN PERSONA (BIAR AI NGGAK NGARANG LINK) =====
+# ===== ATURAN PERSONA (BIAR AI NULIS RUMUS RAPI) =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah, santai, dan membantu. PENTING: Jangan pernah mengarang link YouTube atau URL. Jika user minta rekomendasi video, cukup sebutkan judul dan channel-nya saja tanpa link.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. PENTING: Jangan pernah mengarang link YouTube atau URL.",
-    "Koki Profesional": "Kamu adalah koki profesional. PENTING: Jangan pernah mengarang link YouTube atau URL.",
-    "Programmer Expert": "Kamu adalah senior programmer. PENTING: Jangan pernah mengarang link YouTube atau URL."
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika diminta menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\(. Tulis rumus secara rapi seperti di buku pelajaran.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika. Tulis langkah-langkahnya dengan rapi dan jelas, seperti di buku pelajaran.",
+    "Koki Profesional": "Kamu adalah koki profesional.",
+    "Programmer Expert": "Kamu adalah senior programmer."
 }
 def get_system_prompt(): return PERSONAS[st.session_state.get("persona", "Asisten Ramah")]
 
@@ -247,8 +250,8 @@ with col_chat:
     for p in chat["messages"]:
         if p["role"] == "system": continue
         
-        # 1. Bersihin tanda $$ jadi $ (biar rumus ke-render)
-        teks_bersih = p["content"].replace("$$", "$")
+        # 1. Bersihin format AI biar jadi format $...$ (biar ke-render)
+        teks_bersih = p["content"].replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$").replace("$$", "$")
         
         # 2. Render Markdown + LaTeX (Rumus)
         teks_html = markdown.markdown(teks_bersih, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
@@ -269,7 +272,7 @@ with col_chat:
         if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
         chat["messages"].append({"role": "user", "content": user})
         
-        teks_bersih_user = user.replace("$$", "$")
+        teks_bersih_user = user.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$").replace("$$", "$")
         teks_html_user = markdown.markdown(teks_bersih_user, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
         teks_html_user = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html_user)
         
