@@ -288,7 +288,7 @@ elif st.session_state.menu == "about":
             
             {foto_html}
             
-            <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmiallah</h1>
+            <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmaliah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
             
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
@@ -300,7 +300,7 @@ elif st.session_state.menu == "about":
                 <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
                     <span style="font-size: 20px;">🐙</span> GitHub Saya
                 </a>
-                <a href="https://www.linkedin.com/in/revaldi-syahmiallah/" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <a href="https://www.linkedin.com/in/revaldi-syahmaliah/" target="_blank" style="text-decoration: none; background: #0A66C2; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
                     <span style="font-size: 20px;">💼</span> LinkedIn Saya
                 </a>
             </div>
