@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from groq import Groq
 import uuid
 import json
@@ -31,23 +32,43 @@ user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# ===== CSS MODERN (Tema Gelap & Neon) =====
+# Logo Google dalam bentuk SVG
+google_svg = '<svg width="20" height="20" viewBox="0 0 48 48" style="vertical-align: middle; margin-right: 8px;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
+
+# ===== CSS MODERN =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
-    /* Background Utama */
-    .stApp {{ background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%); }}
+    .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
     
     /* Styling Sidebar */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
+        display: block !important;
+    }}
+    [data-testid="collapsedControl"] {{ display: none !important; }}
+
+    /* Styling Chat Input */
+    [data-testid="stChatInput"] {{
+        position: fixed !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        width: 100% !important;
+        background: #06080E !important;
+        padding: 15px 20px !important;
+        z-index: 9999 !important;
+        border-top: 1px solid #1F2937;
+    }}
+    .stChatInput {{
+        padding-left: 320px !important; 
+        padding-right: 400px !important;
     }}
 
-    /* Styling Kotak Chat */
+    /* Styling Bubble Chat */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
@@ -108,11 +129,19 @@ if not is_logged_in:
     
     col1, col2, col3 = st.columns([1,1.5,1])
     with col2:
-        if st.button("🚀 Login with Google", type="primary", use_container_width=True):
-            st.login()
+        # Tombol pakai Markdown biar bisa nampilin logo SVG
+        if st.markdown(f'<a href="?login_google=true" target="_self" style="text-decoration:none; display:flex; align-items:center; justify-content:center; background:white; color:black; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:15px; border:1px solid #ccc;">{google_svg} Login with Google</a>', unsafe_allow_html=True):
+            pass
+            
         if st.button("👤 Masuk sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
+
+    # Cek URL param buat login Google
+    if "login_google" in st.query_params:
+        st.query_params.clear()
+        st.login()
+        
     st.stop()
 
 # Setup User Info
