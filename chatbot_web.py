@@ -612,4 +612,8 @@ elif st.session_state.menu == "about":
             
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
                 Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (
+                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
+            </p>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border
