@@ -104,7 +104,7 @@ if not is_logged_in:
     with col2:
         if st.button("Login with Google", type="primary", use_container_width=True):
             st.login()
-        if st.button("Masuk sebagai Tamu", use_container_width=True):
+        if st.button("Login sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
     st.stop()
