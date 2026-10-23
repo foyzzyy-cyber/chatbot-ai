@@ -127,10 +127,10 @@ def muat_dari_db():
     return data
 init_db()
 
-# ===== ATURAN PERSONA =====
+# ===== ATURAN PERSONA (BIAR RUMUS RAPI) =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX ($...$). JANGAN PERNAH pakai tabel Markdown (| ... |) untuk rumus. Cukup gunakan list (poin-poin) atau paragraf biasa.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$) untuk setiap rumus. JANGAN pakai tabel Markdown, cukup list atau paragraf.",
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\(. JANGAN pakai tabel Markdown, cukup list atau paragraf.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika. Jangan pakai tabel Markdown.",
     "Koki Profesional": "Kamu adalah koki profesional.",
     "Programmer Expert": "Kamu adalah senior programmer."
 }
@@ -165,6 +165,9 @@ if "current_id" not in st.session_state:
 
 # ===== FUNGSI RENDER PESAN (DETEKSI RUMUS) =====
 def render_pesan(teks, is_user=False):
+    # Ubah format \[ ... \] dan \( ... \) jadi $$ ... $$ (biar kebaca)
+    teks = teks.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$$").replace("\\)", "$$")
+    
     # Pisahkan teks berdasarkan $$...$$ (rumus blok)
     parts = re.split(r'(\$\$.*?\$\$)', teks, flags=re.DOTALL)
     
