@@ -12,13 +12,13 @@ import base64
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
-    page_title="AI Portofolio Revaldi",
+    page_title="AI Portofolio",
     page_icon="🤖",
-    layout="centered",
-    initial_sidebar_state="expanded"
+    layout="wide", # <--- WIDE LAYOUT BIAR BISA 3 KOLOM
+    initial_sidebar_state="collapsed"
 )
 
-# ===== FUNGSI BUAT NGELOAD GAMBAR AVATAR =====
+# ===== FUNGSI AVATAR =====
 def get_image_base64(path):
     try:
         with open(path, "rb") as f:
@@ -29,96 +29,131 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS CUSTOM SUPER KEREN =====
+# ===== CSS MODERN (GLASSMORPHISM & NEON) =====
 st.markdown(f"""
 <style>
-    /* 1. Sembunyiin header & footer bawaan Streamlit biar bersih */
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-    header {{visibility: hidden;}}
-    
-    /* 2. Atur jarak konten utama */
-    .block-container {{
-        padding-top: 2rem;
-        padding-bottom: 5rem;
-        max-width: 800px;
-    }}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    /* 3. Font yang lebih modern */
     html, body, [class*="css"] {{
         font-family: 'Inter', sans-serif;
     }}
 
-    /* 4. Container Chat */
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    header {{visibility: hidden;}}
+    
+    .stApp {{
+        background: radial-gradient(circle at top left, #1A1B3A 0%, #0B0F19 100%);
+    }}
+
+    /* Sidebar Kiri */
+    [data-testid="stSidebar"] {{
+        background-color: #111827;
+        border-right: 1px solid #1F2937;
+    }}
+
+    /* Area Chat */
+    .chat-container {{
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }}
+
     .chat-row {{
         display: flex;
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         align-items: flex-start;
     }}
     
-    /* 5. Layout User (Kanan) */
-    .chat-row.user {{
-        justify-content: flex-end;
-    }}
+    .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
-        background-color: #2D2D2D;
+        background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
         color: white;
-        padding: 12px 18px;
-        border-radius: 18px;
-        border-top-right-radius: 4px; /* Bikin ujungnya lancip */
+        padding: 14px 20px;
+        border-radius: 20px 20px 5px 20px;
         max-width: 75%;
         font-size: 15px;
         line-height: 1.6;
-        width: fit-content; /* <--- INI BIAR NGGAK GEPENG */
-        word-wrap: break-word;
+        width: fit-content;
+        box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
     }}
     .chat-row.user .avatar {{
         margin-left: 12px;
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background-color: #444;
         background-size: cover;
         flex-shrink: 0;
+        border: 2px solid #7C3AED;
     }}
 
-    /* 6. Layout AI (Kiri) */
-    .chat-row.ai {{
-        justify-content: flex-start;
-    }}
+    .chat-row.ai {{ justify-content: flex-start; }}
     .chat-row.ai .bubble {{
-        background-color: transparent;
-        color: #E0E0E0;
-        padding: 12px 0px 12px 18px;
-        max-width: 85%;
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        color: #E2E8F0;
+        padding: 14px 20px;
+        border-radius: 20px 20px 20px 5px;
+        max-width: 80%;
         font-size: 15px;
         line-height: 1.6;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }}
     .chat-row.ai .avatar {{
         margin-right: 12px;
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background-color: #A855F7;
+        background-color: #7C3AED;
         background-size: cover;
         flex-shrink: 0;
+        border: 2px solid #A855F7;
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+    }}
+
+    /* Panel Kanan (Kartu AI) */
+    .right-panel {{
+        background: #111827;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #1F2937;
+        margin-bottom: 20px;
+    }}
+    .ai-profile {{
+        text-align: center;
+        padding: 20px 0;
+        background: linear-gradient(180deg, rgba(124,58,237,0.2) 0%, rgba(17,24,39,0) 100%);
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }}
+    .ai-avatar-big {{
+        width: 100px;
+        height: 100px;
+        background: #1E293B;
+        border-radius: 50%;
+        margin: 0 auto 15px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        border: 2px solid #7C3AED;
+        box-shadow: 0 0 20px rgba(124,58,237,0.5);
     }}
     
-    /* 7. Welcome Screen */
-    .welcome-container {{
-        text-align: center;
-        margin-top: 20vh;
+    .capability-item {{
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
     }}
-    .welcome-container h1 {{
-        color: #A855F7;
-        font-size: 2.5em;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }}
-    .welcome-container p {{
-        color: #888;
-        font-size: 16px;
+    
+    /* Ngilangin kotak chat bawaan Streamlit */
+    [data-testid="stChatInput"] {{
+        background: transparent;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -128,9 +163,11 @@ st.markdown(f"""
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
 if not st.user.is_logged_in:
-    st.markdown('<div class="welcome-container"><h1>🤖 AI Portofolio</h1><p>Silakan login untuk mulai.</p></div>', unsafe_allow_html=True)
-    if st.button("Login with Google", type="primary", use_container_width=True):
-        st.login()
+    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 AI Portofolio</h1><p>Silakan login untuk mulai.</p></div>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1,1,1])
+    with col2:
+        if st.button("Login with Google", type="primary", use_container_width=True):
+            st.login()
     st.stop()
 
 user_email = st.user.email
@@ -226,24 +263,20 @@ if "current_id" not in st.session_state:
     else:
         bikin_chat_baru()
 
-# ===== SIDEBAR =====
+# ===== SIDEBAR KIRI =====
 with st.sidebar:
-    st.title("💬 Obrolan")
+    st.markdown("<h2 style='color:#A855F7; display:flex; align-items:center; gap:10px;'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
     
     if user_avatar_b64:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:12px; color:gray;">{user_email}</span></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #A855F7;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
     
-    if st.button("Logout", use_container_width=True):
-        st.logout()
-    
-    st.markdown("---")
-    st.selectbox("Mode AI:", list(PERSONAS.keys()), key="persona")
-    
-    if st.button("➕ Obrolan Baru", use_container_width=True, type="primary"):
+    if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
         bikin_chat_baru()
         st.rerun()
-    
-    st.markdown("---")
+        
+    st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 Chat</p>", unsafe_allow_html=True)
     
     for chat_id, chat_data in st.session_state.conversations.items():
         is_active = (chat_id == st.session_state.current_id)
@@ -251,56 +284,85 @@ with st.sidebar:
         if st.button(label, key=f"chat_{chat_id}", use_container_width=True):
             st.session_state.current_id = chat_id
             st.rerun()
+            
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.selectbox("Pilih Kepribadian:", list(PERSONAS.keys()), key="persona")
     
-    if len(st.session_state.conversations) > 1:
-        if st.button("🗑️ Hapus Obrolan", use_container_width=True):
-            del st.session_state.conversations[st.session_state.current_id]
-            st.session_state.current_id = list(st.session_state.conversations.keys())[0]
-            simpan_ke_file()
-            st.rerun()
-
-    st.markdown("---")
+    if st.button("Logout", use_container_width=True):
+        st.logout()
     
-    chat_aktif = ambil_chat_aktif()
-    teks_chat = "".join([f"{msg['role'].upper()}: {msg['content']}\n\n" for msg in chat_aktif["messages"] if msg["role"] != "system"])
-    st.download_button("📥 Download Obrolan", data=teks_chat, file_name=f"chat_{chat_aktif['title']}.txt", mime="text/plain", use_container_width=True)
-
-    st.markdown("---")
-    st.subheader("📄 Baca File")
-    uploaded_file = st.file_uploader("Upload PDF", type=["pdf"], label_visibility="collapsed")
-    if uploaded_file and st.button("Proses PDF", use_container_width=True):
-        with st.spinner("Membaca..."):
-            pdf_text = extract_text_from_pdf(uploaded_file)
-            chat_aktif["messages"].append({"role": "system", "content": f"Gunakan info dokumen ini:\n\n{pdf_text[:10000]}"})
-            simpan_ke_file()
-            st.success("Berhasil!")
-            st.rerun()
-
-    st.subheader("🌐 Baca Web")
-    url_input = st.text_input("Tempel URL:", label_visibility="collapsed")
-    if st.button("Proses Link", use_container_width=True):
-        if url_input:
-            with st.spinner("Membaca..."):
-                teks_web = ambil_teks_dari_url(url_input)
-                chat_aktif["messages"].append({"role": "system", "content": f"Gunakan info web ini:\n\n{teks_web}"})
-                simpan_ke_file()
-                st.success("Berhasil!")
-                st.rerun()
-
-# ===== AREA CHAT =====
-chat = ambil_chat_aktif()
-
-if chat["messages"][0]["role"] == "system":
-    chat["messages"][0]["content"] = get_system_prompt()
-
-if len(chat["messages"]) == 1:
+    # Card Upgrade
     st.markdown("""
-    <div class="welcome-container">
-        <h1>Ada yang bisa dibantu?</h1>
-        <p>Silakan ketik pertanyaan, upload PDF, atau masukin link artikel.</p>
+    <div style="background: linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(17,24,39,0.8) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(124,58,237,0.3); margin-top: 20px;">
+        <p style="color:#A855F7; font-weight:bold; font-size:14px; margin-bottom:5px;">✨ Upgrade to Pro</p>
+        <p style="font-size:10px; color:#9CA3AF; margin-bottom:10px;">Dapatkan fitur lebih lengkap untuk pengalaman AI yang maksimal.</p>
+        <div style="background:#7C3AED; text-align:center; padding:8px; border-radius:8px; color:white; font-size:12px; font-weight:bold;">Upgrade</div>
     </div>
     """, unsafe_allow_html=True)
-else:
+
+# ===== LAYOUT UTAMA (3 KOLOM) =====
+col_chat, col_right = st.columns([2.5, 1])
+
+# --- KOLOM KANAN (PANEL AI & FITUR) ---
+with col_right:
+    st.markdown("""
+    <div class="ai-profile">
+        <div class="ai-avatar-big">🤖</div>
+        <h3 style="margin:0; color:white;">AI Assistant</h3>
+        <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu kamu 24/7</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>", unsafe_allow_html=True)
+    
+    # Fitur List
+    fitur = [
+        ("💬", "Tanya Jawab", "Dapatkan jawaban cepat"),
+        ("📄", "Rangkuman", "Ringkas informasi panjang"),
+        ("💡", "Kreativitas", "Ide, tulisan, dan konsep"),
+        ("💻", "Pemrograman", "Bantuan coding dan debugging"),
+        ("📚", "Belajar", "Jelaskan topik apa saja"),
+    ]
+    
+    for icon, title, desc in fitur:
+        st.markdown(f"""
+        <div class="capability-item">
+            <div style="font-size:20px; margin-right:10px; background:rgba(124,58,237,0.2); padding:8px; border-radius:10px;">{icon}</div>
+            <div>
+                <p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p>
+                <p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(124,58,237,0.3) 0%, rgba(17,24,39,0) 100%); padding: 20px; border-radius: 15px; text-align:center; margin-top:20px;">
+        <p style="color:white; font-weight:bold; font-size:14px;">Bersama AI,<br>semua jadi lebih mudah!</p>
+        <p style="font-size:30px; margin-top:10px;">😊</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- KOLOM TENGAH (CHAT) ---
+with col_chat:
+    # Header Chat
+    st.markdown(f"""
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;">
+        <div>
+            <h2 style="margin:0; color:white;">Chat dengan AI</h2>
+            <p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja, kapan saja!</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2);">
+            <div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    chat = ambil_chat_aktif()
+    
+    if chat["messages"][0]["role"] == "system":
+        chat["messages"][0]["content"] = get_system_prompt()
+
+    # Tampilkan History Chat (Custom HTML)
     for p in chat["messages"]:
         if p["role"] == "system": continue
         teks_html = markdown.markdown(p["content"])
@@ -324,43 +386,43 @@ else:
             </div>
             ''', unsafe_allow_html=True)
 
-# Input user
-user = st.chat_input("Ketik pesan di sini...")
+    # Input Chat
+    user = st.chat_input("Ketik pesan Anda di sini...")
 
-if user:
-    if len(chat["messages"]) == 1:
-        chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
-    
-    chat["messages"].append({"role": "user", "content": user})
-    teks_html_user = markdown.markdown(user)
-    avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
-    avatar_content = '' if user_avatar_b64 else '🧑'
-    
-    st.markdown(f'''
-    <div class="chat-row user">
-        <div class="bubble">{teks_html_user}</div>
-        <div class="avatar" {avatar_style}>{avatar_content}</div>
-    </div>
-    ''', unsafe_allow_html=True)
+    if user:
+        if len(chat["messages"]) == 1:
+            chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
+        
+        chat["messages"].append({"role": "user", "content": user})
+        teks_html_user = markdown.markdown(user)
+        avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
+        avatar_content = '' if user_avatar_b64 else '🧑'
+        
+        st.markdown(f'''
+        <div class="chat-row user">
+            <div class="bubble">{teks_html_user}</div>
+            <div class="avatar" {avatar_style}>{avatar_content}</div>
+        </div>
+        ''', unsafe_allow_html=True)
 
-    with st.spinner(""):
-        try:
-            stream = client.chat.completions.create(
-                model="openai/gpt-oss-120b",
-                messages=chat["messages"],
-                stream=True 
-            )
-            
-            def generate_chunks():
-                for chunk in stream:
-                    if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
-                        yield chunk.choices[0].delta.content
-            
-            jawab = st.write_stream(generate_chunks())
-            
-            if jawab:
-                chat["messages"].append({"role": "assistant", "content": jawab})
-                simpan_ke_file()
-                st.rerun()
-        except Exception as e:
-            st.error(f"⚠️ Error: {e}")
+        with st.spinner(""):
+            try:
+                stream = client.chat.completions.create(
+                    model="openai/gpt-oss-120b",
+                    messages=chat["messages"],
+                    stream=True 
+                )
+                
+                def generate_chunks():
+                    for chunk in stream:
+                        if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
+                            yield chunk.choices[0].delta.content
+                
+                jawab = st.write_stream(generate_chunks())
+                
+                if jawab:
+                    chat["messages"].append({"role": "assistant", "content": jawab})
+                    simpan_ke_file()
+                    st.rerun()
+            except Exception as e:
+                st.error(f"⚠️ Error: {e}")
