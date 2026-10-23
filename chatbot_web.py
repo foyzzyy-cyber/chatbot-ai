@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import sqlite3
 import base64
 import re
-import streamlit.components.v1 as components
+import markdown
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -89,22 +89,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# ===== MATHJAX UNTUK RENDER RUMUS =====
-components.html(
-    """
-    <script>
-    MathJax = {
-      tex: {inlineMath: [['$', '$'], ['\\\\(', '\\\\)']]},
-      svg: {fontCache: 'global'}
-    };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-    </script>
-    """,
-    height=0,
-)
-
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
@@ -146,7 +130,7 @@ init_db()
 # ===== ATURAN PERSONA =====
 PERSONAS = {
     "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\). Tulis rumus secara rapi.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika. Tulis langkah-langkahnya dengan rapi dan jelas.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika.",
     "Koki Profesional": "Kamu adalah koki profesional.",
     "Programmer Expert": "Kamu adalah senior programmer."
 }
@@ -178,6 +162,29 @@ if "conversations" not in st.session_state: st.session_state.conversations = mua
 if "current_id" not in st.session_state:
     if st.session_state.conversations: st.session_state.current_id = list(st.session_state.conversations.keys())[0]
     else: bikin_chat_baru()
+
+# ===== FUNGSI RENDER PESAN (DETEKSI RUMUS) =====
+def render_pesan(teks, is_user=False):
+    # Pisahkan teks berdasarkan $$...$$ (rumus blok)
+    parts = re.split(r'(\$\$.*?\$\$)', teks, flags=re.DOTALL)
+    
+    for part in parts:
+        if not part.strip(): continue
+        
+        # Jika bagian ini adalah rumus blok ($$ ... $$)
+        if part.strip().startswith('$$') and part.strip().endswith('$$'):
+            rumus = part.strip()[2:-2].strip()
+            st.latex(rumus)
+        else:
+            # Jika teks biasa, render pakai markdown
+            teks_html = markdown.markdown(part, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br'])
+            teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
+            
+            if is_user:
+                st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+
 
 # ===== SIDEBAR KIRI =====
 with st.sidebar:
@@ -223,7 +230,6 @@ with col_right:
     </div>
     """, unsafe_allow_html=True)
 
-    # Upload PDF
     st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
     
@@ -262,17 +268,7 @@ with col_chat:
 
     for p in chat["messages"]:
         if p["role"] == "system": continue
-        
-        teks_bersih = p["content"].replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
-        teks_html = teks_bersih.replace("\n", "<br>") # simple HTML
-        teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
-
-        if p["role"] == "user":
-            avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
-            st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" {avatar_style}></div></div>', unsafe_allow_html=True)
-        else:
-            avatar_style = f'style="background-image: url(data:image/png;base64,{bot_avatar_b64});"' if bot_avatar_b64 else ''
-            st.markdown(f'<div class="chat-row ai"><div class="avatar" {avatar_style}></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+        render_pesan(p["content"], is_user=(p["role"] == "user"))
 
     user = st.chat_input("Ketik pesan Anda di sini...")
 
@@ -280,12 +276,7 @@ with col_chat:
         if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
         chat["messages"].append({"role": "user", "content": user})
         
-        teks_bersih_user = user.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
-        teks_html_user = teks_bersih_user.replace("\n", "<br>")
-        teks_html_user = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html_user)
-        
-        avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
-        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html_user}</div><div class="avatar" {avatar_style}></div></div>', unsafe_allow_html=True)
+        render_pesan(user, is_user=True)
 
         with st.spinner(""):
             try:
