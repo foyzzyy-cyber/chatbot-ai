@@ -94,15 +94,31 @@ st.markdown(f"""
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
-if not st.user.is_logged_in:
-    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 AI Portofolio</h1><p>Silakan login untuk mulai.</p></div>', unsafe_allow_html=True)
+# Cek apakah user login (lewat Google atau Tamu)
+is_guest = st.session_state.get("guest_mode", False)
+is_logged_in = st.user.is_logged_in or is_guest
+
+if not is_logged_in:
+    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 AI Portofolio</h1><p>Silakan login atau masuk sebagai tamu.</p></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1,1,1])
     with col2:
         if st.button("Login with Google", type="primary", use_container_width=True):
             st.login()
+        if st.button("Masuk sebagai Tamu", use_container_width=True):
+            st.session_state.guest_mode = True
+            st.rerun()
     st.stop()
 
-user_email = st.user.email
+# Setup User Info
+if is_guest:
+    user_email = "tamu@guest.com" # Email dummy buat tamu
+    display_name = "Tamu"
+    avatar_to_use = "" # Nggak pakai foto profil
+else:
+    user_email = st.user.email
+    display_name = user_email.split("@")[0]
+    avatar_to_use = user_avatar_b64
+
 folder_user = f"data_{user_email.replace('@', '_').replace('.', '_')}"
 os.makedirs(folder_user, exist_ok=True)
 
@@ -172,7 +188,7 @@ def render_pesan(teks, is_user=False):
     teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
 
     if is_user:
-        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{avatar_to_use});"></div></div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
@@ -181,8 +197,10 @@ with st.sidebar:
     st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
     
-    if user_avatar_b64:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
+    if avatar_to_use:
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{avatar_to_use}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background:#1E293B; border: 2px solid #3B82F6; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
@@ -204,7 +222,12 @@ with st.sidebar:
         st.markdown("<br>", unsafe_allow_html=True)
         st.selectbox("Pilih Kepribadian:", list(PERSONAS.keys()), key="persona")
     
-    if st.button("Logout", use_container_width=True): st.logout()
+    if st.button("Logout", use_container_width=True): 
+        if is_guest:
+            st.session_state.guest_mode = False
+            st.rerun()
+        else:
+            st.logout()
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(37,99,235,0.3); margin-top: 20px;">
