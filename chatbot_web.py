@@ -124,6 +124,8 @@ if not is_logged_in:
             max-width: 1100px;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 10;
         }
         .left-panel {
             flex: 1;
@@ -253,6 +255,10 @@ if not is_logged_in:
             background: #E5E7EB;
             transform: translateY(-2px);
         }
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
         .btn-guest {
             background: transparent;
             color: #60A5FA;
@@ -283,15 +289,45 @@ if not is_logged_in:
         }
         .footer-text a { color: #60A5FA; text-decoration: none; }
         
-        /* Gambar dekorasi di kiri bawah */
-        .decoration {
+        /* Dekorasi Planet CSS */
+        .planet-container {
             position: absolute;
-            bottom: -50px;
-            left: -50px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
-            z-index: -1;
+            bottom: -100px;
+            left: -100px;
+            width: 500px;
+            height: 500px;
+            z-index: 1;
+        }
+        .planet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at 30% 30%, #60A5FA, #1E3A8A, #0B0F19);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(96, 165, 250, 0.4), inset -20px -20px 50px rgba(0,0,0,0.8);
+        }
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            width: 500px;
+            height: 120px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+        .ring-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            width: 600px;
+            height: 150px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
             border-radius: 50%;
         }
     </style>
@@ -316,7 +352,14 @@ if not is_logged_in:
                         <div class="feature-icon">👤</div> Percakapan yang personal
                     </div>
                 </div>
-                <div class="decoration"></div>
+                
+                <!-- Dekorasi Planet -->
+                <div class="planet-container">
+                    <div class="ring-2"></div>
+                    <div class="ring"></div>
+                    <div class="planet"></div>
+                </div>
+                
             </div>
             
             <div class="right-panel">
@@ -327,7 +370,7 @@ if not is_logged_in:
                     
                     <form action="" method="get">
                         <button class="btn btn-google" name="login_google">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20"> 
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G"> 
                             Lanjutkan dengan Google
                         </button>
                         
@@ -569,18 +612,4 @@ elif st.session_state.menu == "about":
             
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
                 Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (
