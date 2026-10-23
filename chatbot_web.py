@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="AI Portofolio",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="expanded" # <--- SIDEBAR DIBUKA LAGI
+    initial_sidebar_state="expanded"
 )
 
 # ===== FUNGSI AVATAR =====
@@ -37,7 +37,14 @@ st.markdown(f"""
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
     .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #0B0F19 100%); }}
-    [data-testid="stSidebar"] {{ background-color: #111827; border-right: 1px solid #1F2937; }}
+    
+    /* Paksa Sidebar Tampil */
+    [data-testid="stSidebar"] {{ 
+        background-color: #111827 !important; 
+        border-right: 1px solid #1F2937;
+        display: block !important;
+    }}
+    [data-testid="collapsedControl"] {{ display: none !important; }}
 
     /* Chat Bubble Custom */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
@@ -61,7 +68,8 @@ st.markdown(f"""
     .ai-avatar-big {{ width: 100px; height: 100px; background: #1E293B; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #7C3AED; box-shadow: 0 0 20px rgba(124,58,237,0.5); }}
     .capability-item {{ display: flex; align-items: center; padding: 10px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }}
     
-    /* Ngilangin kotak chat bawaan Streamlit */
+    /* Input Chat di Bawah */
+    .main .block-container {{ padding-bottom: 100px; }}
     [data-testid="stChatInput"] {{ background: transparent; }}
 </style>
 """, unsafe_allow_html=True)
