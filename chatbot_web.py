@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="AI Portofolio",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="expanded" # <--- SIDEBAR DIBUKA
+    initial_sidebar_state="collapsed" # SIDEBAR BAWAAN DIMATIIN TOTAL
 )
 
 # ===== FUNGSI AVATAR =====
@@ -30,7 +30,7 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN (PAKSA SIDEBAR MUNCUL) =====
+# ===== CSS MODERN =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -39,14 +39,8 @@ st.markdown(f"""
     
     .stApp {{ background: #06080E; }}
     
-    /* PAKSA SIDEBAR MUNCUL & NGGAK BISA DITUTUP */
-    [data-testid="stSidebar"] {{ 
-        background-color: #0B0F19 !important; 
-        border-right: 1px solid #1F2937;
-        display: block !important;
-        min-width: 280px !important;
-        max-width: 280px !important;
-    }}
+    /* Sembunyiin sidebar bawaan Streamlit total */
+    [data-testid="stSidebar"] {{ display: none !important; }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
 
     [data-testid="stChatInput"] {{
@@ -60,7 +54,7 @@ st.markdown(f"""
         border-top: 1px solid #1F2937;
     }}
     .stChatInput {{
-        padding-left: 300px !important; /* Geser biar ga nabrak sidebar */
+        padding-left: 320px !important; 
         padding-right: 400px !important;
     }}
 
@@ -177,31 +171,35 @@ def render_pesan(teks, is_user=False):
     else:
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# ===== SIDEBAR KIRI (MENU NAVIGASI) =====
-with st.sidebar:
-    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
+# ===== LAYOUT UTAMA (3 KOLOM MANUAL) =====
+col_sidebar, col_chat, col_right = st.columns([1, 2.5, 1])
+
+# --- SIDEBAR KUSTOM (KIRI) ---
+with col_sidebar:
+    st.markdown(f"""
+    <div style="background: #0B0F19; border-radius: 20px; padding: 20px; border: 1px solid #1F2937; height: 100%;">
+        <h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5); margin-top:0;'><span style='font-size:30px;'>✨</span> AI Chat</h2>
+        <p style='color:#6B7280; font-size:12px; margin-top:-10px; margin-bottom:20px;'>Your Smart Assistant</p>
+        
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;">
+            <div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div>
+            <div><b style="font-size:14px;">{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    if user_avatar_b64:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
-    
-    # Navigasi Menu
+    # Tombol Navigasi
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
     if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.menu == "chat" else "secondary"):
-        st.session_state.menu = "chat"
-        st.rerun()
-        
-    if st.button("👨‍💻 Tentang Pembuat", use_container_width=True, type="primary" if st.session_state.menu == "about" else "secondary"):
-        st.session_state.menu = "about"
-        st.rerun()
-        
+        st.session_state.menu = "chat"; st.rerun()
+    if st.button("👨‍💻 Tentang", use_container_width=True, type="primary" if st.session_state.menu == "about" else "secondary"):
+        st.session_state.menu = "about"; st.rerun()
     if st.button("➕ Chat Baru", use_container_width=True):
         bikin_chat_baru(); st.session_state.menu = "chat"; st.rerun()
         
-    st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color:#1F2937;'>", unsafe_allow_html=True)
     
-    # History Chat cuma muncul kalau lagi di menu chat
     if st.session_state.menu == "chat":
         st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 History</p>", unsafe_allow_html=True)
         for chat_id, chat_data in st.session_state.conversations.items():
@@ -213,19 +211,9 @@ with st.sidebar:
         st.selectbox("Pilih Kepribadian:", list(PERSONAS.keys()), key="persona")
     
     if st.button("Logout", use_container_width=True): st.logout()
-    
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(37,99,235,0.3); margin-top: 20px;">
-        <p style="color:#3B82F6; font-weight:bold; font-size:14px; margin-bottom:5px;">✨ Upgrade to Pro</p>
-        <p style="font-size:10px; color:#9CA3AF; margin-bottom:10px;">Dapatkan fitur lebih lengkap.</p>
-        <div style="background:#2563EB; text-align:center; padding:8px; border-radius:8px; color:white; font-size:12px; font-weight:bold; box-shadow: 0 0 10px rgba(37,99,235,0.4);">Upgrade</div>
-    </div>
-    """, unsafe_allow_html=True)
 
-# ===== KONTEN UTAMA =====
+# --- KONTEN UTAMA (TENGAH & KANAN) ---
 if st.session_state.menu == "chat":
-    col_chat, col_right = st.columns([2.5, 1])
-    
     with col_right:
         st.markdown("""
         <div class="ai-profile">
@@ -285,22 +273,18 @@ if st.session_state.menu == "chat":
                 except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
-    st.markdown("""
-    <div style="max-width: 800px; margin: 0 auto; padding-top: 50px;">
-        <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
-            
+    with col_chat:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center; margin-top: 50px;">
             <div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">
                 🧑‍💻
             </div>
-            
             <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmialiah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
-            
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
                 Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
                 Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
             </p>
-            
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                 <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
                     <span style="font-size: 20px;">🐙</span> GitHub Saya
@@ -309,7 +293,5 @@ elif st.session_state.menu == "about":
                     <span style="font-size: 20px;">💼</span> LinkedIn Saya
                 </a>
             </div>
-            
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
