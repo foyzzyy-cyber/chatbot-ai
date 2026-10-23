@@ -306,8 +306,20 @@ if st.session_state.get("menu") == "about":
     """
     components.html(html_content, height=600, scrolling=True)
     
-    if st.button("⬅️ Kembali ke Chat", use_container_width=True):
-        st.session_state.menu = "chat"; st.rerun()
+    # Tombol Kembali Modern
+    st.markdown("""
+    <a href="?menu=chat" target="_self" style="text-decoration: none; display: block;">
+        <div style="background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); padding: 15px; border-radius: 12px; text-align: center; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(37,99,235,0.4); transition: 0.3s;">
+            ⬅️ Kembali ke Chat
+        </div>
+    </a>
+    """, unsafe_allow_html=True)
+    
+    # Logika nangkep URL param
+    if "menu" in st.query_params and st.query_params["menu"] == "chat":
+        st.session_state.menu = "chat"
+        st.query_params.clear()
+        st.rerun()
 
 else:
     col_chat, col_right = st.columns([2.5, 1])
