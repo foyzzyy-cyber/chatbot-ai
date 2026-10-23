@@ -88,6 +88,11 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
+
+    /* Sembunyiin elemen Streamlit biar halaman login full screen */
+    .stApp > header {{ display: none; }}
+    .stApp > .main {{ padding: 0; }}
+    .block-container {{ padding: 0 !important; max-width: 100% !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,7 +117,6 @@ if not is_logged_in:
             margin: 0;
             padding: 0;
             height: 100vh;
-            /* Background lebih gelap & biru pekat */
             background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%);
             font-family: 'Inter', sans-serif;
             color: white;
@@ -195,20 +199,17 @@ if not is_logged_in:
             z-index: 2;
         }}
         .login-card {{
-            /* Background kaca transparan */
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(30px);
             border-radius: 30px;
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            /* Border biru tebal */
             border: 1px solid rgba(59, 130, 246, 0.4);
             box-shadow: 0 0 50px rgba(37, 99, 235, 0.2), inset 0 0 20px rgba(37, 99, 235, 0.1);
             text-align: center;
             position: relative;
         }}
-        /* Efek Glow di luar kotak */
         .login-card::before {{
             content: "";
             position: absolute;
@@ -566,20 +567,4 @@ elif st.session_state.menu == "about":
             <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmaliah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
             
-            <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
-                Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
-                Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
-            </p>
-            
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+            <p style="color: #
