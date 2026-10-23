@@ -1,8 +1,8 @@
 [theme]
 base = "dark"
-primaryColor = "#A855F7"          # Ungu Neon
-backgroundColor = "#0B0F19"       # Navy Gelap
-secondaryBackgroundColor = "#111827" # Panel Sidebar
+primaryColor = "#3B82F6"
+backgroundColor = "#06080E"
+secondaryBackgroundColor = "#0B0F19"
 textColor = "#E2E8F0"
 font = "sans serif"
 
