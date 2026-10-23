@@ -275,7 +275,7 @@ if st.session_state.menu == "chat":
                 except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
-    # Tampilan Tentang Pembuat
+    # Tampilan Tentang Pembuat (PAKAI unsafe_allow_html=True)
     st.markdown("""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
