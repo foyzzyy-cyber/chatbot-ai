@@ -99,7 +99,7 @@ is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
-    # === HALAMAN LOGIN MODERN PAKAI HTML CSS ===
+    # === HALAMAN LOGIN MODERN (HTML/CSS MURNI) ===
     html_login = """
     <!DOCTYPE html>
     <html>
@@ -109,111 +109,247 @@ if not is_logged_in:
         body {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            background: #06080E;
+            background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%);
             font-family: 'Inter', sans-serif;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
         .container {
+            display: flex;
+            width: 90%;
+            max-width: 1100px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .left-panel {
+            flex: 1;
+            padding-right: 50px;
             position: relative;
-            z-index: 1;
-            text-align: center;
-            padding: 50px;
-            background: rgba(17, 24, 39, 0.4);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 50px rgba(37, 99, 235, 0.2);
-            width: 400px;
         }
-        .glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            background: #2563EB;
-            filter: blur(120px);
-            opacity: 0.3;
-            z-index: -1;
-            border-radius: 50%;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 40px;
         }
-        .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .logo-icon {
+            color: #60A5FA;
+            font-size: 32px;
         }
         h1 {
-            font-size: 36px;
+            font-size: 48px;
             font-weight: 800;
-            margin-bottom: 10px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+        .gradient-text {
             background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        p {
+        p.subtitle {
+            color: #9CA3AF;
+            font-size: 18px;
+            margin-bottom: 40px;
+            max-width: 400px;
+        }
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #60A5FA;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .login-card {
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.1), inset 0 0 20px rgba(37, 99, 235, 0.05);
+            text-align: center;
+            position: relative;
+        }
+        .login-card::before {
+            content: "";
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #60A5FA, #A855F7, #60A5FA);
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(10px);
+        }
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(37, 99, 235, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 30px;
+            color: #60A5FA;
+        }
+        .login-card h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .login-card p {
             color: #9CA3AF;
             font-size: 14px;
             margin-bottom: 30px;
-            line-height: 1.6;
         }
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             width: 100%;
             padding: 15px;
-            margin-bottom: 15px;
-            border: none;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            margin-bottom: 20px;
         }
         .btn-google {
-            background: #FFFFFF;
+            background: white;
             color: #000;
+            border: none;
         }
         .btn-google:hover {
             background: #E5E7EB;
             transform: translateY(-2px);
         }
         .btn-guest {
-            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
-            color: white;
+            background: transparent;
+            color: #60A5FA;
+            border: 1px solid #60A5FA;
         }
         .btn-guest:hover {
+            background: rgba(96, 165, 250, 0.1);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #4B5563;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #1F2937;
+        }
+        .divider:not(:empty)::before { margin-right: 15px; }
+        .divider:not(:empty)::after { margin-left: 15px; }
+        .footer-text {
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 20px;
+        }
+        .footer-text a { color: #60A5FA; text-decoration: none; }
+        
+        /* Gambar dekorasi di kiri bawah */
+        .decoration {
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+            z-index: -1;
+            border-radius: 50%;
         }
     </style>
     </head>
     <body>
-        <div class="glow"></div>
         <div class="container">
-            <div class="icon">🤖</div>
-            <h1>Rval AI</h1>
-            <p>Selamat datang! Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan asisten cerdas.</p>
+            <div class="left-panel">
+                <div class="logo">
+                    <span class="logo-icon">✨</span> Rval AI
+                </div>
+                <h1>Temukan cara baru<br>untuk <span class="gradient-text">berpikir.</span></h1>
+                <p class="subtitle">Asisten AI cerdas untuk ide, belajar, dan produktivitas.</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div> Jawaban lebih cepat
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💡</div> Ide tanpa batas
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">👤</div> Percakapan yang personal
+                    </div>
+                </div>
+                <div class="decoration"></div>
+            </div>
             
-            <form action="" method="get">
-                <button class="btn btn-google" name="login_google">Login with Google</button>
-                <button class="btn btn-guest" name="login_guest">Login sebagai Tamu</button>
-            </form>
+            <div class="right-panel">
+                <div class="login-card">
+                    <div class="card-icon">🤖</div>
+                    <h2>Selamat datang kembali 👋</h2>
+                    <p>Masuk untuk melanjutkan percakapanmu</p>
+                    
+                    <form action="" method="get">
+                        <button class="btn btn-google" name="login_google">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20"> 
+                            Lanjutkan dengan Google
+                        </button>
+                        
+                        <div class="divider">atau</div>
+                        
+                        <button class="btn btn-guest" name="login_guest">
+                            <span>👤</span> Masuk sebagai tamu
+                        </button>
+                    </form>
+                    
+                    <div class="footer-text">
+                        Dengan melanjutkan, kamu menyetujui<br>
+                        <a href="#">Ketentuan Layanan</a> dan <a href="#">Kebijakan Privasi</a>.
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
     </html>
     """
     
-    components.html(html_login, height=600)
+    components.html(html_login, height=700)
     
     # Tombol Streamlit (disembunyiin di bawah, dipicu lewat URL param)
     if "login_guest" in st.query_params:
