@@ -29,46 +29,51 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN (WARNA BIRU NAVY & NEON) =====
+# ===== CSS MODERN (KONTRAS TINGGI & NEON GLOW) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
-    /* Background Utama - Biru Gelap Navy */
-    .stApp {{ background: radial-gradient(circle at top left, #0F172A 0%, #0B0F19 100%); }}
+    /* 1. BACKGROUND LEBIH GELAP (HAMPIR HITAM) */
+    .stApp {{ background: #06080E; }}
     
-    /* Sidebar - Biru Gelap */
+    /* 2. SIDEBAR LEBIH KONTRAS */
     [data-testid="stSidebar"] {{ 
-        background-color: #111827 !important; 
+        background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
         display: block !important;
     }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
 
-    /* Chat Bubble Custom */
+    /* 3. CHAT BUBBLE DENGAN EFEK NEON LEBIH TEBAL */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
-        /* Warna Biru Neon */
-        background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+        background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
         color: white; padding: 14px 20px; border-radius: 20px 20px 5px 20px;
-        max-width: 75%; font-size: 15px; line-height: 1.6; width: fit-content; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        max-width: 75%; font-size: 15px; line-height: 1.6; width: fit-content; 
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); /* Glow Biru */
+        border: 1px solid rgba(255,255,255,0.1);
     }}
-    .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; }}
+    .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; flex-shrink: 0; border: 2px solid #2563EB; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }}
 
     .chat-row.ai {{ justify-content: flex-start; }}
     .chat-row.ai .bubble {{
-        background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); color: #E2E8F0;
-        padding: 14px 20px; border-radius: 20px 20px 20px 5px; max-width: 80%; font-size: 15px; line-height: 1.6; border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); color: #E2E8F0;
+        padding: 14px 20px; border-radius: 20px 20px 20px 5px; max-width: 80%; font-size: 15px; line-height: 1.6; 
+        border: 1px solid rgba(59, 130, 246, 0.3); /* Border Biru Tipis */
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }}
-    .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #3B82F6; background-size: cover; flex-shrink: 0; border: 2px solid #8B5CF6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }}
+    .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
-    /* Panel Kanan */
-    .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(59,130,246,0.2) 0%, rgba(17,24,39,0) 100%); border-radius: 20px; margin-bottom: 20px; }}
-    .ai-avatar-big {{ width: 100px; height: 100px; background: #1E293B; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #3B82F6; box-shadow: 0 0 20px rgba(59,130,246,0.5); }}
-    .capability-item {{ display: flex; align-items: center; padding: 10px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }}
+    /* 4. PANEL KANAN (KARTU AI) */
+    .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
+    .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
+    
+    .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
+    .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -147,7 +152,7 @@ if "current_id" not in st.session_state:
 
 # ===== SIDEBAR KIRI =====
 with st.sidebar:
-    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px;'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
     
     if user_avatar_b64:
@@ -170,10 +175,10 @@ with st.sidebar:
     if st.button("Logout", use_container_width=True): st.logout()
     
     st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(17,24,39,0.8) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(59,130,246,0.3); margin-top: 20px;">
+    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(37,99,235,0.3); margin-top: 20px;">
         <p style="color:#3B82F6; font-weight:bold; font-size:14px; margin-bottom:5px;">✨ Upgrade to Pro</p>
         <p style="font-size:10px; color:#9CA3AF; margin-bottom:10px;">Dapatkan fitur lebih lengkap.</p>
-        <div style="background:#3B82F6; text-align:center; padding:8px; border-radius:8px; color:white; font-size:12px; font-weight:bold;">Upgrade</div>
+        <div style="background:#2563EB; text-align:center; padding:8px; border-radius:8px; color:white; font-size:12px; font-weight:bold; box-shadow: 0 0 10px rgba(37,99,235,0.4);">Upgrade</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -192,17 +197,17 @@ with col_right:
     
     fitur = [("💬", "Tanya Jawab", "Dapatkan jawaban cepat"), ("📄", "Rangkuman", "Ringkas informasi panjang"), ("💡", "Kreativitas", "Ide, tulisan, dan konsep"), ("💻", "Pemrograman", "Bantuan coding dan debugging"), ("📚", "Belajar", "Jelaskan topik apa saja")]
     for icon, title, desc in fitur:
-        st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(59,130,246,0.2); padding:8px; border-radius:10px;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
         
     st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(59,130,246,0.3) 0%, rgba(17,24,39,0) 100%); padding: 20px; border-radius: 15px; text-align:center; margin-top:20px;">
+    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(6,8,14,0) 100%); padding: 20px; border-radius: 15px; text-align:center; margin-top:20px; border: 1px solid rgba(37,99,235,0.2);">
         <p style="color:white; font-weight:bold; font-size:14px;">Bersama AI,<br>semua jadi lebih mudah!</p>
         <p style="font-size:30px; margin-top:10px;">😊</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col_chat:
-    st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
 
     chat = ambil_chat_aktif()
     if chat["messages"][0]["role"] == "system": chat["messages"][0]["content"] = get_system_prompt()
