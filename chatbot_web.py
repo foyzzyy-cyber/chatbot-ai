@@ -41,13 +41,13 @@ st.markdown(f"""
     
     .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
     
+    /* Sidebar Kiri */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
-        display: block !important;
     }}
-    [data-testid="collapsedControl"] {{ display: none !important; }}
 
+    /* Chat Input di Bawah */
     [data-testid="stChatInput"] {{
         position: fixed !important;
         bottom: 0px !important;
