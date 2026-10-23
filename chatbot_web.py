@@ -127,10 +127,10 @@ def muat_dari_db():
     return data
 init_db()
 
-# ===== ATURAN PERSONA =====
+# ===== ATURAN PERSONA (BIAR RUMUS RAPI & PAKAI TABEL) =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\(. Tulis rumus secara rapi.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika.",
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus. BOLEH pakai tabel Markdown jika perlu merangkum rumus.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$) untuk setiap rumus matematika. BOLEH pakai tabel Markdown untuk merangkum rumus.",
     "Koki Profesional": "Kamu adalah koki profesional.",
     "Programmer Expert": "Kamu adalah senior programmer."
 }
@@ -163,31 +163,21 @@ if "current_id" not in st.session_state:
     if st.session_state.conversations: st.session_state.current_id = list(st.session_state.conversations.keys())[0]
     else: bikin_chat_baru()
 
-# ===== FUNGSI RENDER PESAN (TRIK REGEX) =====
+# ===== FUNGSI RENDER PESAN (MARKDOWN-KATEX) =====
 def render_pesan(teks, is_user=False):
-    # Ubah format \[ \] dan \( \) jadi $ $
-    teks = teks.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
+    # Bersihin format AI \[ \] atau \( \) biar jadi $...$
+    teks = teks.replace("\\[", "$").replace("\\]", "$").replace("\\(", "$").replace("\\)", "$")
     
-    # Pisahkan teks dan rumus menggunakan Regex
-    # Regex ini nangkep teks biasa ATAU rumus (yang diapit $...$ atau $$...$$)
-    parts = re.split(r'(\$\$.*?\$\$|\$.*?\$)', teks, flags=re.DOTALL)
+    # Render Markdown + LaTeX (Rumus)
+    teks_html = markdown.markdown(teks, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
     
-    for part in parts:
-        if not part.strip(): continue
-        
-        # Cek apakah bagian ini adalah rumus
-        if (part.startswith('$$') and part.endswith('$$')) or (part.startswith('$') and part.endswith('$')):
-            rumus = part.strip('$').strip()
-            st.latex(rumus)
-        else:
-            # Render teks biasa pakai markdown
-            teks_html = markdown.markdown(part, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br'])
-            teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
-            
-            if is_user:
-                st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+    # Ubah link mentah jadi link HTML yang bisa diklik
+    teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
+
+    if is_user:
+        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
 
 # ===== SIDEBAR KIRI =====
