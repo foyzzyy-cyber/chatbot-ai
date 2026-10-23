@@ -14,7 +14,7 @@ import re
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
-    page_title="Selamat Datang di AI Assistant",
+    page_title="Rval AI - Asisten Cerdas",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -128,8 +128,8 @@ if not is_logged_in:
         st.markdown("""
             <div class="login-card">
                 <div style="font-size: 60px; margin-bottom: 20px;">👋</div>
-                <h1 class="login-title">Selamat Datang!</h1>
-                <p class="login-subtitle">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan AI.</p>
+                <h1 class="login-title">Selamat Datang di Rval AI!</h1>
+                <p class="login-subtitle">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan asisten cerdas.</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -144,9 +144,9 @@ if not is_logged_in:
 
 # Setup User Info
 if is_guest:
-    user_email = "tamu@guest.com" # Email dummy buat tamu
+    user_email = "tamu@guest.com" 
     display_name = "Tamu"
-    avatar_to_use = "" # Nggak pakai foto profil
+    avatar_to_use = "" 
 else:
     user_email = st.user.email
     display_name = user_email.split("@")[0]
@@ -180,10 +180,10 @@ init_db()
 
 # ===== ATURAN PERSONA =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika.",
-    "Koki Profesional": "Kamu adalah koki profesional.",
-    "Programmer Expert": "Kamu adalah senior programmer."
+    "Asisten Ramah": "Kamu adalah Rval AI, asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok.",
+    "Guru Matematika": "Kamu adalah Rval AI, guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika.",
+    "Koki Profesional": "Kamu adalah Rval AI, koki profesional.",
+    "Programmer Expert": "Kamu adalah Rval AI, senior programmer."
 }
 def get_system_prompt(): return PERSONAS[st.session_state.get("persona", "Asisten Ramah")]
 
@@ -227,8 +227,8 @@ def render_pesan(teks, is_user=False):
 
 # ===== SIDEBAR KIRI =====
 with st.sidebar:
-    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> AI Chat</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Your Smart Assistant</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> Rval AI</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Asisten Cerdas Anda</p>", unsafe_allow_html=True)
     
     if avatar_to_use:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{avatar_to_use}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
@@ -278,7 +278,7 @@ if st.session_state.menu == "chat":
         st.markdown("""
         <div class="ai-profile">
             <div class="ai-avatar-big">🤖</div>
-            <h3 style="margin:0; color:white;">AI Assistant</h3>
+            <h3 style="margin:0; color:white;">Rval AI</h3>
             <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu 24/7</p>
         </div>
         """, unsafe_allow_html=True)
@@ -304,7 +304,7 @@ if st.session_state.menu == "chat":
             st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
 
     with col_chat:
-        st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan Rval AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
 
         chat = ambil_chat_aktif()
         if chat["messages"][0]["role"] == "system": chat["messages"][0]["content"] = get_system_prompt()
