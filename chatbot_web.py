@@ -32,14 +32,14 @@ user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# ===== CSS MODERN =====
+# ===== CSS MODERN (GLASSMORPHISM & NEON) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
     
-    .stApp {{ background: #06080E; }}
+    .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
     
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
@@ -88,6 +88,30 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
+
+    /* CSS KHUSUS HALAMAN LOGIN */
+    .login-card {{
+        background: rgba(17, 24, 39, 0.6);
+        backdrop-filter: blur(20px);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(37, 99, 235, 0.1);
+        text-align: center;
+    }}
+    .login-title {{
+        background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }}
+    .login-subtitle {{
+        color: #9CA3AF;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -99,18 +123,21 @@ is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
-    st.markdown("""
-        <div style="text-align:center; margin-top:15vh;">
-            <h1 style="color: white; font-size: 48px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(37,99,235,0.5);">👋 Selamat Datang!</h1>
-            <p style="color: #9CA3AF; font-size: 18px; margin-bottom: 40px;">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan AI.</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1,1.5,1])
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
-        if st.button("Login with Google", type="primary", use_container_width=True):
+        st.markdown("""
+            <div class="login-card">
+                <div style="font-size: 60px; margin-bottom: 20px;">👋</div>
+                <h1 class="login-title">Selamat Datang!</h1>
+                <p class="login-subtitle">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan AI.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("🚀 Login with Google", type="primary", use_container_width=True):
             st.login()
-        if st.button("Login sebagai Tamu", use_container_width=True):
+        if st.button("👤 Login sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
     st.stop()
