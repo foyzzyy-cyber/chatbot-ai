@@ -330,4 +330,4 @@ elif st.session_state.menu == "about":
         </div>
     </div>
     """
-    st.markdown(html_content, unsafe_allow_html=True)
+    components.html(html_content, height=600, scrolling=True)
