@@ -247,10 +247,13 @@ with col_chat:
     for p in chat["messages"]:
         if p["role"] == "system": continue
         
-        # Render Markdown + LaTeX (Rumus)
-        teks_html = markdown.markdown(p["content"], extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        # 1. Bersihin tanda $$ jadi $ (biar rumus ke-render)
+        teks_bersih = p["content"].replace("$$", "$")
         
-        # Ubah link mentah jadi link HTML yang bisa diklik
+        # 2. Render Markdown + LaTeX (Rumus)
+        teks_html = markdown.markdown(teks_bersih, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        
+        # 3. Ubah link mentah jadi link HTML yang bisa diklik
         teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
 
         if p["role"] == "user":
@@ -266,7 +269,8 @@ with col_chat:
         if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
         chat["messages"].append({"role": "user", "content": user})
         
-        teks_html_user = markdown.markdown(user, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        teks_bersih_user = user.replace("$$", "$")
+        teks_html_user = markdown.markdown(teks_bersih_user, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
         teks_html_user = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html_user)
         
         avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
