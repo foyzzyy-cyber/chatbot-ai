@@ -14,7 +14,7 @@ import re
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
-    page_title="AI Portofolio",
+    page_title="Selamat Datang di AI Assistant",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -99,8 +99,14 @@ is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
 if not is_logged_in:
-    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 AI Portofolio</h1><p>Silakan login atau masuk sebagai tamu.</p></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1,1,1])
+    st.markdown("""
+        <div style="text-align:center; margin-top:15vh;">
+            <h1 style="color: white; font-size: 48px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(37,99,235,0.5);">👋 Selamat Datang!</h1>
+            <p style="color: #9CA3AF; font-size: 18px; margin-bottom: 40px;">Silakan login atau masuk sebagai tamu untuk mulai ngobrol dengan AI.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,1.5,1])
     with col2:
         if st.button("Login with Google", type="primary", use_container_width=True):
             st.login()
