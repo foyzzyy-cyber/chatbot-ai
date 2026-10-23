@@ -131,6 +131,7 @@ if not is_logged_in:
             flex: 1;
             padding-right: 50px;
             position: relative;
+            z-index: 2;
         }
         .logo {
             display: flex;
@@ -187,6 +188,8 @@ if not is_logged_in:
             flex: 1;
             display: flex;
             justify-content: flex-end;
+            position: relative;
+            z-index: 2;
         }
         .login-card {
             background: rgba(17, 24, 39, 0.4);
@@ -288,48 +291,6 @@ if not is_logged_in:
             margin-top: 20px;
         }
         .footer-text a { color: #60A5FA; text-decoration: none; }
-        
-        /* Dekorasi Planet CSS */
-        .planet-container {
-            position: absolute;
-            bottom: -100px;
-            left: -100px;
-            width: 500px;
-            height: 500px;
-            z-index: 1;
-        }
-        .planet {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle at 30% 30%, #60A5FA, #1E3A8A, #0B0F19);
-            border-radius: 50%;
-            box-shadow: 0 0 50px rgba(96, 165, 250, 0.4), inset -20px -20px 50px rgba(0,0,0,0.8);
-        }
-        .ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-20deg);
-            width: 500px;
-            height: 120px;
-            border: 2px solid rgba(168, 85, 247, 0.4);
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
-        }
-        .ring-2 {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-20deg);
-            width: 600px;
-            height: 150px;
-            border: 1px solid rgba(96, 165, 250, 0.2);
-            border-radius: 50%;
-        }
     </style>
     </head>
     <body>
@@ -352,14 +313,6 @@ if not is_logged_in:
                         <div class="feature-icon">👤</div> Percakapan yang personal
                     </div>
                 </div>
-                
-                <!-- Dekorasi Planet -->
-                <div class="planet-container">
-                    <div class="ring-2"></div>
-                    <div class="ring"></div>
-                    <div class="planet"></div>
-                </div>
-                
             </div>
             
             <div class="right-panel">
