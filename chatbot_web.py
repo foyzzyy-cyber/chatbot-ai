@@ -29,7 +29,7 @@ def get_image_base64(path):
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 
-# ===== CSS MODERN (KONTRAS TINGGI & NEON GLOW) =====
+# ===== CSS MODERN (KONTRAS TINGGI & INPUT CHAT DI BAWAH) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -47,14 +47,31 @@ st.markdown(f"""
     }}
     [data-testid="collapsedControl"] {{ display: none !important; }}
 
-    /* 3. CHAT BUBBLE DENGAN EFEK NEON LEBIH TEBAL */
+    /* 3. PINDAHIN INPUT CHAT KE PALING BAWAH */
+    [data-testid="stChatInput"] {{
+        position: fixed !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        width: 100% !important;
+        background: #06080E !important;
+        padding: 15px 20px !important;
+        z-index: 9999 !important;
+        border-top: 1px solid #1F2937;
+    }}
+    /* Geser input biar sejajar sama chat (nggak nabrak sidebar) */
+    .stChatInput {{
+        padding-left: 320px !important; 
+        padding-right: 400px !important;
+    }}
+
+    /* 4. CHAT BUBBLE DENGAN EFEK NEON LEBIH TEBAL */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
         background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
         color: white; padding: 14px 20px; border-radius: 20px 20px 5px 20px;
         max-width: 75%; font-size: 15px; line-height: 1.6; width: fit-content; 
-        box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); /* Glow Biru */
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
         border: 1px solid rgba(255,255,255,0.1);
     }}
     .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; flex-shrink: 0; border: 2px solid #2563EB; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }}
@@ -63,12 +80,12 @@ st.markdown(f"""
     .chat-row.ai .bubble {{
         background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); color: #E2E8F0;
         padding: 14px 20px; border-radius: 20px 20px 20px 5px; max-width: 80%; font-size: 15px; line-height: 1.6; 
-        border: 1px solid rgba(59, 130, 246, 0.3); /* Border Biru Tipis */
+        border: 1px solid rgba(59, 130, 246, 0.3);
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }}
     .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
-    /* 4. PANEL KANAN (KARTU AI) */
+    /* 5. PANEL KANAN (KARTU AI) */
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
     .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
     
