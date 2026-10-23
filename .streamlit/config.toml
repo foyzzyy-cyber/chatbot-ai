@@ -1,10 +1,10 @@
 [theme]
 base = "dark"
-primaryColor = "#A855F7"
-backgroundColor = "#0A0A0A"
-secondaryBackgroundColor = "#1A1A2E"
-textColor = "#E0E0FF"
-font = "monospace"
+primaryColor = "#A855F7"          # Ungu Neon
+backgroundColor = "#0B0F19"       # Navy Gelap
+secondaryBackgroundColor = "#111827" # Panel Sidebar
+textColor = "#E2E8F0"
+font = "sans serif"
 
 [server]
 headless = true
