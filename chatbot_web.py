@@ -129,7 +129,7 @@ init_db()
 
 # ===== ATURAN PERSONA =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\(. Tulis rumus secara rapi.",
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\). Tulis rumus secara rapi.",
     "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika.",
     "Koki Profesional": "Kamu adalah koki profesional.",
     "Programmer Expert": "Kamu adalah senior programmer."
@@ -163,31 +163,21 @@ if "current_id" not in st.session_state:
     if st.session_state.conversations: st.session_state.current_id = list(st.session_state.conversations.keys())[0]
     else: bikin_chat_baru()
 
-# ===== FUNGSI RENDER PESAN (TRIK REGEX) =====
+# ===== FUNGSI RENDER PESAN (MARKDOWN-KATEX) =====
 def render_pesan(teks, is_user=False):
-    # Ubah format \[ \] dan \( \) jadi $ $
-    teks = teks.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
+    # Bersihin format AI \[ \] atau \( \) biar jadi $...$
+    teks = teks.replace("\\[", "$").replace("\\]", "$").replace("\\(", "$").replace("\\)", "$")
     
-    # Pisahkan teks dan rumus menggunakan Regex
-    # Regex ini nangkep teks biasa ATAU rumus (yang diapit $...$ atau $$...$$)
-    parts = re.split(r'(\$\$.*?\$\$|\$.*?\$)', teks, flags=re.DOTALL)
+    # Render Markdown + LaTeX (Rumus)
+    teks_html = markdown.markdown(teks, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
     
-    for part in parts:
-        if not part.strip(): continue
-        
-        # Cek apakah bagian ini adalah rumus
-        if (part.startswith('$$') and part.endswith('$$')) or (part.startswith('$') and part.endswith('$')):
-            rumus = part.strip('$').strip()
-            st.latex(rumus)
-        else:
-            # Render teks biasa pakai markdown
-            teks_html = markdown.markdown(part, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br'])
-            teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
-            
-            if is_user:
-                st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+    # Ubah link mentah jadi link HTML yang bisa diklik
+    teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
+
+    if is_user:
+        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{user_avatar_b64});"></div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
 
 # ===== SIDEBAR KIRI =====
@@ -256,11 +246,21 @@ with col_right:
     fitur = [("💬", "Tanya Jawab", "Dapatkan jawaban cepat"), ("📄", "Rangkuman", "Ringkas informasi panjang"), ("💡", "Kreativitas", "Ide, tulisan, dan konsep"), ("💻", "Pemrograman", "Bantuan coding dan debugging"), ("📚", "Belajar", "Jelaskan topik apa saja")]
     for icon, title, desc in fitur:
         st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
-        
+
+    # ===== KARTU TENTANG PEMBUAT =====
     st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(6,8,14,0) 100%); padding: 20px; border-radius: 15px; text-align:center; margin-top:20px; border: 1px solid rgba(37,99,235,0.2);">
-        <p style="color:white; font-weight:bold; font-size:14px;">Bersama AI,<br>semua jadi lebih mudah!</p>
-        <p style="font-size:30px; margin-top:10px;">😊</p>
+    <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 20px; border-radius: 15px; text-align:center; margin-top:20px; border: 1px solid rgba(37,99,235,0.3);">
+        <p style="color:#3B82F6; font-weight:bold; font-size:14px; margin-bottom:10px;">👨‍💻 Tentang Pembuat</p>
+        <div style="width: 80px; height: 80px; background: #1E293B; border-radius: 50%; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid #2563EB; box-shadow: 0 0 20px rgba(37,99,235,0.5);">
+            🧑‍💻
+        </div>
+        <h4 style="margin:0; color:white; font-size: 16px;">Revaldi Syahmialiah</h4>
+        <p style="color:#9CA3AF; font-size:11px; margin-bottom:15px;">Full-stack Developer & AI Enthusiast</p>
+        
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration:none; background:#1F2937; padding:8px 12px; border-radius:8px; color:white; font-size:12px;">GitHub</a>
+            <a href="https://linkedin.com/in/usernamekamu" target="_blank" style="text-decoration:none; background:#0A66C2; padding:8px 12px; border-radius:8px; color:white; font-size:12px;">LinkedIn</a>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
