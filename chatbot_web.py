@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from groq import Groq
 import uuid
 import json
@@ -304,7 +305,7 @@ elif st.session_state.menu == "about":
     else:
         foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
 
-    st.markdown(f"""
+    html_content = f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
             
@@ -328,4 +329,5 @@ elif st.session_state.menu == "about":
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(html_content, unsafe_allow_html=True)
