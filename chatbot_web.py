@@ -182,18 +182,17 @@ with st.sidebar:
     if user_avatar_b64:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{user_avatar_b64}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{user_email.split("@")[0]}</b><br><span style="font-size:10px; color:#6B7280;">Premium</span></div></div>', unsafe_allow_html=True)
     
+    if "menu" not in st.session_state: st.session_state.menu = "chat"
+    
     if st.button("➕ Chat Baru", use_container_width=True, type="primary"):
         bikin_chat_baru(); st.session_state.menu = "chat"; st.rerun()
         
-    # TOMBOL TENTANG PEMBUAT
-    if "menu" not in st.session_state: st.session_state.menu = "chat"
     if st.button("👨‍💻 Tentang Pembuat", use_container_width=True, type="secondary"):
         st.session_state.menu = "about"; st.rerun()
         
     st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
     st.markdown("<p style='color:#E5E7EB; font-weight:600; margin-bottom:10px;'>💬 Chat</p>", unsafe_allow_html=True)
     
-    # History cuma muncul kalau lagi di menu chat
     if st.session_state.menu == "chat":
         for chat_id, chat_data in st.session_state.conversations.items():
             is_active = (chat_id == st.session_state.current_id)
@@ -276,6 +275,7 @@ if st.session_state.menu == "chat":
                 except Exception as e: st.error(f"⚠️ Error: {e}")
 
 elif st.session_state.menu == "about":
+    # Tampilan Tentang Pembuat
     st.markdown("""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
