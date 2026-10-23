@@ -6,10 +6,10 @@ from pypdf import PdfReader
 import os
 import requests
 from bs4 import BeautifulSoup
-import markdown
 import sqlite3
 import base64
 import re
+import streamlit.components.v1 as components
 
 # ===== KONFIGURASI HALAMAN =====
 st.set_page_config(
@@ -86,11 +86,24 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
-    
-    /* CSS buat ngerapiin render LaTeX */
-    .katex-display {{ margin: 10px 0; overflow-x: auto; }}
 </style>
 """, unsafe_allow_html=True)
+
+# ===== MATHJAX UNTUK RENDER RUMUS =====
+components.html(
+    """
+    <script>
+    MathJax = {
+      tex: {inlineMath: [['$', '$'], ['\\\\(', '\\\\)']]},
+      svg: {fontCache: 'global'}
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    """,
+    height=0,
+)
 
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
@@ -130,10 +143,10 @@ def muat_dari_db():
     return data
 init_db()
 
-# ===== ATURAN PERSONA (BIAR AI NULIS RUMUS RAPI) =====
+# ===== ATURAN PERSONA =====
 PERSONAS = {
-    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika diminta menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\(. Tulis rumus secara rapi seperti di buku pelajaran.",
-    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika. Tulis langkah-langkahnya dengan rapi dan jelas, seperti di buku pelajaran.",
+    "Asisten Ramah": "Kamu adalah asisten AI yang ramah. Jika menjelaskan matematika, SELALU gunakan format LaTeX dengan tanda $...$ untuk rumus inline, dan $$...$$ untuk rumus blok. Jangan pakai \\[ atau \\). Tulis rumus secara rapi.",
+    "Guru Matematika": "Kamu adalah guru matematika yang sabar. WAJIB pakai format LaTeX ($...$ atau $$...$$) untuk setiap rumus matematika. Tulis langkah-langkahnya dengan rapi dan jelas.",
     "Koki Profesional": "Kamu adalah koki profesional.",
     "Programmer Expert": "Kamu adalah senior programmer."
 }
@@ -250,13 +263,8 @@ with col_chat:
     for p in chat["messages"]:
         if p["role"] == "system": continue
         
-        # 1. Bersihin format AI biar jadi format $...$ (biar ke-render)
-        teks_bersih = p["content"].replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$").replace("$$", "$")
-        
-        # 2. Render Markdown + LaTeX (Rumus)
-        teks_html = markdown.markdown(teks_bersih, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
-        
-        # 3. Ubah link mentah jadi link HTML yang bisa diklik
+        teks_bersih = p["content"].replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
+        teks_html = teks_bersih.replace("\n", "<br>") # simple HTML
         teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
 
         if p["role"] == "user":
@@ -272,8 +280,8 @@ with col_chat:
         if len(chat["messages"]) == 1: chat["title"] = user[:30] + ("..." if len(user) > 30 else "")
         chat["messages"].append({"role": "user", "content": user})
         
-        teks_bersih_user = user.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$").replace("$$", "$")
-        teks_html_user = markdown.markdown(teks_bersih_user, extensions=['markdown.extensions.extra', 'markdown.extensions.nl2br', 'markdown_katex'])
+        teks_bersih_user = user.replace("\\[", "$$").replace("\\]", "$$").replace("\\(", "$").replace("\\)", "$")
+        teks_html_user = teks_bersih_user.replace("\n", "<br>")
         teks_html_user = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html_user)
         
         avatar_style = f'style="background-image: url(data:image/png;base64,{user_avatar_b64});"' if user_avatar_b64 else ''
