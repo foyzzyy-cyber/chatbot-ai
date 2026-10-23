@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from groq import Groq
 import uuid
 import json
@@ -98,265 +97,15 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 is_guest = st.session_state.get("guest_mode", False)
 is_logged_in = st.user.is_logged_in or is_guest
 
-# Fungsi buat nangkep klik tombol tamu dari URL
-if "login_guest" in st.query_params:
-    st.session_state.guest_mode = True
-    st.query_params.clear()
-    st.rerun()
-
 if not is_logged_in:
-    # === HALAMAN LOGIN MODERN (HTML/CSS MURNI) ===
-    google_svg = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
-    
-    html_login = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body {{
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #06080E 100%);
-            font-family: 'Inter', sans-serif;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }}
-        .container {{
-            display: flex;
-            width: 90%;
-            max-width: 1100px;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 10;
-        }}
-        .left-panel {{
-            flex: 1;
-            padding-right: 50px;
-            position: relative;
-            z-index: 2;
-        }}
-        .logo {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 40px;
-        }}
-        .logo-icon {{
-            color: #3B82F6;
-            font-size: 32px;
-        }}
-        h1 {{
-            font-size: 48px;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }}
-        .gradient-text {{
-            background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }}
-        p.subtitle {{
-            color: #9CA3AF;
-            font-size: 18px;
-            margin-bottom: 40px;
-            max-width: 400px;
-        }}
-        .features {{
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }}
-        .feature-item {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 16px;
-            font-weight: 500;
-        }}
-        .feature-icon {{
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(59, 130, 246, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #3B82F6;
-        }}
-        .right-panel {{
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            position: relative;
-            z-index: 2;
-        }}
-        .login-card {{
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(30px);
-            border-radius: 30px;
-            padding: 50px;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 50px rgba(37, 99, 235, 0.2), inset 0 0 20px rgba(37, 99, 235, 0.1);
-            text-align: center;
-            position: relative;
-        }}
-        .login-card::before {{
-            content: "";
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6);
-            border-radius: 32px;
-            z-index: -1;
-            opacity: 0.5;
-            filter: blur(15px);
-        }}
-        .card-icon {{
-            width: 60px;
-            height: 60px;
-            background: rgba(59, 130, 246, 0.2);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-            font-size: 30px;
-            color: #3B82F6;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }}
-        .login-card h2 {{
-            font-size: 24px;
-            margin-bottom: 10px;
-        }}
-        .login-card p {{
-            color: #9CA3AF;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }}
-        .btn {{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }}
-        .btn-google {{
-            background: white;
-            color: #000;
-            border: none;
-        }}
-        .btn-google:hover {{
-            background: #E5E7EB;
-            transform: translateY(-2px);
-        }}
-        .btn-guest {{
-            background: transparent;
-            color: #3B82F6;
-            border: 1px solid #3B82F6;
-        }}
-        .btn-guest:hover {{
-            background: rgba(59, 130, 246, 0.1);
-            transform: translateY(-2px);
-        }}
-        .divider {{
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: #4B5563;
-            margin: 20px 0;
-        }}
-        .divider::before, .divider::after {{
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #1F2937;
-        }}
-        .divider:not(:empty)::before {{ margin-right: 15px; }}
-        .divider:not(:empty)::after {{ margin-left: 15px; }}
-        .footer-text {{
-            font-size: 12px;
-            color: #6B7280;
-            margin-top: 20px;
-        }}
-        .footer-text a {{ color: #3B82F6; text-decoration: none; }}
-    </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="left-panel">
-                <div class="logo">
-                    <span class="logo-icon">✨</span> Rval AI
-                </div>
-                <h1>Temukan cara baru<br>untuk <span class="gradient-text">berpikir.</span></h1>
-                <p class="subtitle">Asisten AI cerdas untuk ide, belajar, dan produktivitas.</p>
-                
-                <div class="features">
-                    <div class="feature-item">
-                        <div class="feature-icon">⚡</div> Jawaban lebih cepat
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">💡</div> Ide tanpa batas
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">👤</div> Percakapan yang personal
-                    </div>
-                </div>
-            </div>
-            
-            <div class="right-panel">
-                <div class="login-card">
-                    <div class="card-icon">🤖</div>
-                    <h2>Selamat datang kembali 👋</h2>
-                    <p>Masuk untuk melanjutkan percakapanmu</p>
-                    
-                    <!-- TOMBOL GOOGLE (Link ke Streamlit login) -->
-                    <a href="/?login_google=true" target="_self" class="btn btn-google" onclick="window.top.location.href='/?login_google=true'; return false;">
-                        {google_svg} 
-                        Lanjutkan dengan Google
-                    </a>
-                    
-                    <div class="divider">atau</div>
-                    
-                    <!-- TOMBOL TAMU (Link ke param login_guest) -->
-                    <a href="/?login_guest=true" target="_self" class="btn btn-guest" onclick="window.top.location.href='/?login_guest=true'; return false;">
-                        <span>👤</span> Masuk sebagai tamu
-                    </a>
-                    
-                    <div class="footer-text">
-                        Dengan melanjutkan, kamu menyetujui<br>
-                        <a href="#">Ketentuan Layanan</a> dan <a href="#">Kebijakan Privasi</a>.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    
-    components.html(html_login, height=700)
-    
-    # Handle klik dari URL param
-    if "login_google" in st.query_params:
-        st.query_params.clear()
-        st.login()
-        
+    st.markdown('<div style="text-align:center; margin-top:20vh;"><h1>🤖 Rval AI</h1><p>Silakan login atau masuk sebagai tamu.</p></div>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1,1,1])
+    with col2:
+        if st.button("Login with Google", type="primary", use_container_width=True):
+            st.login()
+        if st.button("Login sebagai Tamu", use_container_width=True):
+            st.session_state.guest_mode = True
+            st.rerun()
     st.stop()
 
 # Setup User Info
@@ -555,7 +304,7 @@ elif st.session_state.menu == "about":
     else:
         foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
 
-    html_content = f"""
+    st.markdown(f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
             
@@ -579,5 +328,4 @@ elif st.session_state.menu == "about":
             </div>
         </div>
     </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+    """, unsafe_allow_html=True)
