@@ -88,11 +88,6 @@ st.markdown(f"""
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
-
-    /* Sembunyiin elemen Streamlit biar halaman login full screen */
-    .stApp > header {{ display: none; }}
-    .stApp > .main {{ padding: 0; }}
-    .block-container {{ padding: 0 !important; max-width: 100% !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -325,18 +320,16 @@ if not is_logged_in:
                     <h2>Selamat datang kembali 👋</h2>
                     <p>Masuk untuk melanjutkan percakapanmu</p>
                     
-                    <form action="" method="get">
-                        <button class="btn btn-google" name="login_google">
-                            {google_svg} 
-                            Lanjutkan dengan Google
-                        </button>
-                        
-                        <div class="divider">atau</div>
-                        
-                        <button class="btn btn-guest" name="login_guest">
-                            <span>👤</span> Masuk sebagai tamu
-                        </button>
-                    </form>
+                    <a href="?login_guest=true" target="_self" class="btn btn-google">
+                        {google_svg} 
+                        Lanjutkan dengan Google
+                    </a>
+                    
+                    <div class="divider">atau</div>
+                    
+                    <a href="?login_guest=true" target="_self" class="btn btn-guest">
+                        <span>👤</span> Masuk sebagai tamu
+                    </a>
                     
                     <div class="footer-text">
                         Dengan melanjutkan, kamu menyetujui<br>
@@ -572,15 +565,4 @@ elif st.session_state.menu == "about":
                 Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
             </p>
             
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
-            </div>
-        </div>
-    </div>
-    """
-    components.html(html_content, height=600, scrolling=True)
+            <div style="display: flex; justify-content: center; gap: 
