@@ -129,18 +129,39 @@ if not is_logged_in:
     
     col1, col2, col3 = st.columns([1,1.5,1])
     with col2:
-        # Tombol pakai Markdown biar bisa nampilin logo SVG
-        if st.markdown(f'<a href="?login_google=true" target="_self" style="text-decoration:none; display:flex; align-items:center; justify-content:center; background:white; color:black; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:15px; border:1px solid #ccc;">{google_svg} Login with Google</a>', unsafe_allow_html=True):
-            pass
+        # Trik: Pakai CSS buat nyisipin logo Google ke tombol Streamlit asli
+        st.markdown("""
+        <style>
+        /* Target tombol pertama (Login Google) */
+        div[data-testid="stButton"]:nth-of-type(1) button {
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid #ccc !important;
+            font-weight: bold !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Nempelin logo Google di kiri tombol */
+        div[data-testid="stButton"]:nth-of-type(1) button::before {
+            content: "";
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Login with Google", use_container_width=True):
+            st.login()
             
         if st.button("👤 Masuk sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
-
-    # Cek URL param buat login Google
-    if "login_google" in st.query_params:
-        st.query_params.clear()
-        st.login()
         
     st.stop()
 
@@ -274,6 +295,7 @@ with st.sidebar:
 
 # ===== KONTEN UTAMA =====
 if st.session_state.get("menu") == "about":
+    # Trik CSS biar foto profil full di lingkaran
     if foto_profil_b64:
         foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
     else:
