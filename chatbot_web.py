@@ -297,7 +297,7 @@ with st.sidebar:
 if st.session_state.get("menu") == "about":
     # Trik CSS biar foto profil full di lingkaran
     if foto_profil_b64:
-        foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
+        foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6); overflow: hidden; position: relative;"><img src="data:image/png;base64,{foto_profil_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(1.05);"></div>'
     else:
         foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
 
