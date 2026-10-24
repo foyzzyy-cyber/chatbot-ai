@@ -20,42 +20,28 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== FUNGSI AVATAR (DIPERBAIKI) =====
+# ===== FUNGSI AVATAR (ANTI-HILANG) =====
 def get_image_base64(path):
-    """Mengembalikan base64 string jika file lokal ada, jika tidak kosong."""
     try:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode()
     except FileNotFoundError:
         return ""
 
-# Coba muat dari file lokal. Jika tidak ada, kita akan pakai URL publik sebagai fallback.
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# Fallback URL (bisa Anda ganti dengan URL Google Drive/imgur Anda)
-USER_AVATAR_URL = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-BOT_AVATAR_URL = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"
-FOTO_PROFIL_URL = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+# Fallback URL Publik jika file lokal tidak ada
+URL_USER = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+URL_BOT = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"
+URL_PROFIL = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
-# Tentukan avatar final yang akan dipakai (prioritas file lokal, fallback ke URL)
-if user_avatar_b64:
-    avatar_user_src = f"data:image/png;base64,{user_avatar_b64}"
-else:
-    avatar_user_src = USER_AVATAR_URL
+avatar_user_src = f"data:image/png;base64,{user_avatar_b64}" if user_avatar_b64 else URL_USER
+avatar_bot_src = f"data:image/png;base64,{bot_avatar_b64}" if bot_avatar_b64 else URL_BOT
+avatar_profil_src = f"data:image/png;base64,{foto_profil_b64}" if foto_profil_b64 else URL_PROFIL
 
-if bot_avatar_b64:
-    avatar_bot_src = f"data:image/png;base64,{bot_avatar_b64}"
-else:
-    avatar_bot_src = BOT_AVATAR_URL
-
-if foto_profil_b64:
-    avatar_profil_src = f"data:image/png;base64,{foto_profil_b64}"
-else:
-    avatar_profil_src = FOTO_PROFIL_URL
-
-# ===== CSS MODERN & RESPONSIF (DIPERBAIKI) =====
+# ===== CSS MODERN & RESPONSIF =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -64,14 +50,17 @@ st.markdown(f"""
     
     .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
     
-    /* Styling Sidebar */
+    /* SIDEBAR FIX */
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
+        z-index: 999999 !important; /* Pastikan di atas elemen lain */
     }}
-    [data-testid="collapsedControl"] {{ display: block !important; }} /* Biarkan tombol buka sidebar muncul di mobile */
+    /* Tombol panah buka sidebar dipaksa muncul */
+    button[kind="header"] {{ display: block !important; color: white !important; }}
+    [data-testid="collapsedControl"] {{ display: block !important; z-index: 999999 !important; }}
 
-    /* Styling Chat Input */
+    /* CHAT INPUT FIX */
     [data-testid="stChatInput"] {{
         position: fixed !important;
         bottom: 0px !important;
@@ -83,37 +72,27 @@ st.markdown(f"""
         border-top: 1px solid #1F2937;
     }}
     
-    /* Padding Input Chat di Desktop */
+    /* Padding Input Desktop */
     @media (min-width: 769px) {{
-        .stChatInput {{
-            padding-left: 320px !important; 
-            padding-right: 400px !important;
-        }}
+        .stChatInput {{ padding-left: 320px !important; padding-right: 400px !important; }}
     }}
-    
-    /* Padding Input Chat di Mobile (Lebih Lega) */
+    /* Padding Input Mobile */
     @media (max-width: 768px) {{
-        .stChatInput {{
-            padding-left: 10px !important; 
-            padding-right: 10px !important;
-        }}
-        .block-container {{
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }}
-        /* Sembunyikan kolom kanan di mobile, atau taruh di bawah */
+        .stChatInput {{ padding-left: 10px !important; padding-right: 10px !important; }}
+        .block-container {{ padding-left: 1rem !important; padding-right: 1rem !important; }}
+        /* Sembunyikan kolom kanan di HP agar chat lega */
+        .hide-on-mobile {{ display: none !important; }}
         .chat-row .bubble {{ max-width: 90% !important; }}
     }}
 
-    /* Styling Bubble Chat */
+    /* BUBBLE CHAT */
     .chat-row {{ display: flex; width: 100%; margin-bottom: 25px; align-items: flex-start; }}
     .chat-row.user {{ justify-content: flex-end; }}
     .chat-row.user .bubble {{
         background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
         color: white; padding: 14px 20px; border-radius: 20px 20px 5px 20px;
         max-width: 75%; font-size: 15px; line-height: 1.6; width: fit-content; 
-        box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); border: 1px solid rgba(255,255,255,0.1);
     }}
     .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; border: 2px solid #2563EB; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }}
 
@@ -121,29 +100,20 @@ st.markdown(f"""
     .chat-row.ai .bubble {{
         background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); color: #E2E8F0;
         padding: 14px 20px; border-radius: 20px 20px 20px 5px; max-width: 80%; font-size: 15px; line-height: 1.6; 
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }}
     .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; background-position: center; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
-    /* Styling Panel Kanan */
+    /* PANEL KANAN */
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
     .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); background-size: cover; background-position: center; }}
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
 
-    /* Styling Halaman Login Modern */
+    /* LOGIN UI */
     .login-container {{ text-align: center; margin-top: 10vh; }}
-    .login-title {{
-        background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 48px;
-        font-weight: 800;
-        margin-bottom: 10px;
-        text-shadow: 0 0 20px rgba(37,99,235,0.5);
-    }}
+    .login-title {{ background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 48px; font-weight: 800; margin-bottom: 10px; text-shadow: 0 0 20px rgba(37,99,235,0.5); }}
     .login-subtitle {{ color: #9CA3AF; font-size: 16px; margin-bottom: 40px; }}
 </style>
 """, unsafe_allow_html=True)
@@ -151,18 +121,13 @@ st.markdown(f"""
 # ===== SETUP API & LOGIN =====
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])   
 
-# Cek apakah user login (lewat Google atau Tamu)
 is_guest = st.session_state.get("guest_mode", False)
-# Pastikan st.user tersedia (untuk berjaga-jaga jika auth belum di-setup)
-try:
-    is_logged_in_google = st.user.is_logged_in
-except Exception:
-    is_logged_in_google = False
+try: is_logged_in_google = st.user.is_logged_in
+except Exception: is_logged_in_google = False
     
 is_logged_in = is_logged_in_google or is_guest
 
 if not is_logged_in:
-    # Tampilan Login Modern (Tapi Tombol Asli Streamlit)
     st.markdown("""
     <div class="login-container">
         <div class="login-title">Rval AI</div>
@@ -172,47 +137,24 @@ if not is_logged_in:
     
     col1, col2, col3 = st.columns([1,1.5,1])
     with col2:
-        # Trik: Pakai CSS buat nyisipin logo Google ke tombol Streamlit asli
         st.markdown("""
         <style>
-        /* Target tombol pertama (Login Google) */
-        div[data-testid="stButton"]:nth-of-type(1) button {
-            background-color: white !important;
-            color: black !important;
-            border: 1px solid #ccc !important;
-            font-weight: bold !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        /* Nempelin logo Google di kiri tombol */
-        div[data-testid="stButton"]:nth-of-type(1) button::before {
-            content: "";
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
+        div[data-testid="stButton"]:nth-of-type(1) button { background-color: white !important; color: black !important; border: 1px solid #ccc !important; font-weight: bold !important; display: flex; justify-content: center; align-items: center; }
+        div[data-testid="stButton"]:nth-of-type(1) button::before { content: ""; background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg'); background-size: contain; background-repeat: no-repeat; display: inline-block; width: 20px; height: 20px; margin-right: 10px; }
         </style>
         """, unsafe_allow_html=True)
         
-        if st.button("Login with Google", use_container_width=True):
-            st.login()
-            
+        if st.button("Login with Google", use_container_width=True): st.login()
         if st.button("👤 Masuk sebagai Tamu", use_container_width=True):
             st.session_state.guest_mode = True
             st.rerun()
-        
     st.stop()
 
 # Setup User Info
 if is_guest:
     user_email = "tamu@guest.com" 
     display_name = "Tamu"
-    avatar_to_use = "" # Tamu pakai inisial/icon default
+    avatar_to_use = URL_USER # Tamu pakai avatar default (tidak kosong lagi)
 else:
     user_email = st.user.email
     display_name = user_email.split("@")[0]
@@ -239,8 +181,7 @@ def muat_dari_db():
     c.execute("SELECT id, title, messages FROM conversations")
     rows = c.fetchall(); conn.close()
     data = {}
-    for row in rows:
-        data[row[0]] = {"title": row[1], "messages": json.loads(row[2])}
+    for row in rows: data[row[0]] = {"title": row[1], "messages": json.loads(row[2])}
     return data
 init_db()
 
@@ -279,21 +220,18 @@ def render_pesan(teks, is_user=False):
     teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
 
     if is_user:
-        # Gunakan avatar_user_src yang sudah kita tentukan (lokal atau URL)
-        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url({avatar_user_src});"></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url({avatar_to_use});"></div></div>', unsafe_allow_html=True)
     else:
-        # Gunakan avatar_bot_src
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url({avatar_bot_src});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# ===== SIDEBAR KIRI =====
+# ===== LOGIKA MENU (PENGGANTI SIDEBAR DI HP) =====
+# Jika di HP, tampilkan tombol toggle untuk membuka menu
 with st.sidebar:
     st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> Rval AI</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Asisten Cerdas Anda</p>", unsafe_allow_html=True)
     
     if avatar_to_use:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url({avatar_to_use}); background-size:cover; background-position:center; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background:#1E293B; border: 2px solid #3B82F6; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
@@ -317,10 +255,8 @@ with st.sidebar:
     
     if st.button("Logout", use_container_width=True): 
         if is_guest:
-            st.session_state.guest_mode = False
-            st.rerun()
-        else:
-            st.logout()
+            st.session_state.guest_mode = False; st.rerun()
+        else: st.logout()
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 15px; border-radius: 15px; border: 1px solid rgba(37,99,235,0.3); margin-top: 20px;">
@@ -332,66 +268,53 @@ with st.sidebar:
 
 # ===== KONTEN UTAMA =====
 if st.session_state.get("menu") == "about":
-    # Bagian Tentang Pembuat
     foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url({avatar_profil_src}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
 
     html_content = f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
         <div style="background: linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(11,15,25,0.9) 100%); padding: 40px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.3); text-align: center;">
-            
             {foto_html}
-            
             <h1 style="color: white; margin-bottom: 5px; font-size: 32px;">Revaldi Syahmaliah</h1>
             <p style="color: #3B82F6; font-size: 18px; font-weight: bold; margin-bottom: 30px;">Full-stack Developer & AI Enthusiast</p>
-            
             <p style="color: #9CA3AF; font-size: 16px; line-height: 1.8; margin-bottom: 40px; text-align: justify;">
                 Halo! Saya adalah seorang pengembang yang bersemangat dalam membangun aplikasi web modern dan mengintegrasikannya dengan Kecerdasan Buatan (AI). 
                 Proyek ini dibuat sebagai portofolio untuk menunjukkan kemampuan saya dalam menggabungkan Python (Streamlit), JavaScript (React), dan API AI (Groq) menjadi satu kesatuan aplikasi yang fungsional dan estetik.
             </p>
-            
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">🐙</span> GitHub Saya
-                </a>
-                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                    <span style="font-size: 20px;">📸</span> Instagram Saya
-                </a>
+                <a href="https://github.com/foyzzyy-cyber" target="_blank" style="text-decoration: none; background: #1F2937; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px;"><span style="font-size: 20px;">🐙</span> GitHub Saya</a>
+                <a href="https://www.instagram.com/rqpnsyq" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold; display: flex; align-items: center; gap: 8px;"><span style="font-size: 20px;">📸</span> Instagram Saya</a>
             </div>
         </div>
     </div>
     """
     components.html(html_content, height=600, scrolling=True)
     
-    # Tombol Kembali Modern
     st.markdown("""
     <a href="?menu=chat" target="_self" style="text-decoration: none; display: block;">
-        <div style="background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); padding: 15px; border-radius: 12px; text-align: center; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(37,99,235,0.4); transition: 0.3s;">
-            ⬅️ Kembali ke Chat
-        </div>
+        <div style="background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); padding: 15px; border-radius: 12px; text-align: center; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(37,99,235,0.4);">⬅️ Kembali ke Chat</div>
     </a>
     """, unsafe_allow_html=True)
     
-    # Logika nangkep URL param
     if "menu" in st.query_params and st.query_params["menu"] == "chat":
-        st.session_state.menu = "chat"
-        st.query_params.clear()
-        st.rerun()
+        st.session_state.menu = "chat"; st.query_params.clear(); st.rerun()
 
 else:
-    # Layout Responsif: Di Desktop 2 kolom, di HP menumpuk (Chat di atas)
+    # --- HEADER CHAT & MENU TOGGLE UNTUK MOBILE ---
+    st.markdown('<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan Rval AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
+
     col_chat, col_right = st.columns([2.5, 1])
     
     with col_right:
-        # Profil Bot
+        # Class "hide-on-mobile" akan menyembunyikan ini di HP agar layar lega
         st.markdown(f"""
-        <div class="ai-profile">
+        <div class="ai-profile hide-on-mobile">
             <div class="ai-avatar-big" style="background-image: url({avatar_bot_src});"></div>
             <h3 style="margin:0; color:white;">Rval AI</h3>
             <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu 24/7</p>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
+        st.markdown("<p class='hide-on-mobile' style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>📄 Upload Dokumen</p>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"], label_visibility="collapsed")
         
         if uploaded_file is not None:
@@ -401,19 +324,16 @@ else:
                     chat_aktif = ambil_chat_aktif()
                     chat_aktif["messages"].append({"role": "system", "content": f"Gunakan informasi dari dokumen berikut:\n\n{pdf_text[:10000]}"})
                     simpan_ke_file()
-                    st.success("PDF berhasil diproses!")
-                    st.rerun()
+                    st.success("PDF berhasil diproses!"); st.rerun()
 
-        st.markdown("<div style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>", unsafe_allow_html=True)
+        st.markdown("<div class='hide-on-mobile' style='height:1px; background:#1F2937; margin:15px 0;'></div>", unsafe_allow_html=True)
+        st.markdown("<p class='hide-on-mobile' style='color:#6B7280; font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:10px;'>Kemampuan</p>", unsafe_allow_html=True)
         
         fitur = [("💬", "Tanya Jawab", "Dapatkan jawaban cepat"), ("📄", "Rangkuman", "Ringkas informasi panjang"), ("💡", "Kreativitas", "Ide, tulisan, dan konsep"), ("💻", "Pemrograman", "Bantuan coding dan debugging"), ("📚", "Belajar", "Jelaskan topik apa saja")]
         for icon, title, desc in fitur:
-            st.markdown(f'<div class="capability-item"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="capability-item hide-on-mobile"><div style="font-size:20px; margin-right:10px; background:rgba(37,99,235,0.2); padding:8px; border-radius:10px; color:#3B82F6;">{icon}</div><div><p style="margin:0; font-weight:bold; font-size:13px; color:white;">{title}</p><p style="margin:0; font-size:10px; color:#9CA3AF;">{desc}</p></div></div>', unsafe_allow_html=True)
 
     with col_chat:
-        st.markdown(f'<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan Rval AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
-
         chat = ambil_chat_aktif()
         if chat["messages"][0]["role"] == "system": chat["messages"][0]["content"] = get_system_prompt()
 
