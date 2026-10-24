@@ -20,22 +20,42 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== FUNGSI AVATAR =====
+# ===== FUNGSI AVATAR (DIPERBAIKI) =====
 def get_image_base64(path):
+    """Mengembalikan base64 string jika file lokal ada, jika tidak kosong."""
     try:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode()
     except FileNotFoundError:
         return ""
 
+# Coba muat dari file lokal. Jika tidak ada, kita akan pakai URL publik sebagai fallback.
 user_avatar_b64 = get_image_base64("user_avatar.png")
 bot_avatar_b64 = get_image_base64("bot_avatar.png")
 foto_profil_b64 = get_image_base64("foto_profil.png")
 
-# Logo Google dalam bentuk SVG
-google_svg = '<svg width="20" height="20" viewBox="0 0 48 48" style="vertical-align: middle; margin-right: 8px;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
+# Fallback URL (bisa Anda ganti dengan URL Google Drive/imgur Anda)
+USER_AVATAR_URL = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+BOT_AVATAR_URL = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"
+FOTO_PROFIL_URL = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
-# ===== CSS MODERN =====
+# Tentukan avatar final yang akan dipakai (prioritas file lokal, fallback ke URL)
+if user_avatar_b64:
+    avatar_user_src = f"data:image/png;base64,{user_avatar_b64}"
+else:
+    avatar_user_src = USER_AVATAR_URL
+
+if bot_avatar_b64:
+    avatar_bot_src = f"data:image/png;base64,{bot_avatar_b64}"
+else:
+    avatar_bot_src = BOT_AVATAR_URL
+
+if foto_profil_b64:
+    avatar_profil_src = f"data:image/png;base64,{foto_profil_b64}"
+else:
+    avatar_profil_src = FOTO_PROFIL_URL
+
+# ===== CSS MODERN & RESPONSIF (DIPERBAIKI) =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -48,9 +68,8 @@ st.markdown(f"""
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
-        display: block !important;
     }}
-    [data-testid="collapsedControl"] {{ display: none !important; }}
+    [data-testid="collapsedControl"] {{ display: block !important; }} /* Biarkan tombol buka sidebar muncul di mobile */
 
     /* Styling Chat Input */
     [data-testid="stChatInput"] {{
@@ -63,9 +82,27 @@ st.markdown(f"""
         z-index: 9999 !important;
         border-top: 1px solid #1F2937;
     }}
-    .stChatInput {{
-        padding-left: 320px !important; 
-        padding-right: 400px !important;
+    
+    /* Padding Input Chat di Desktop */
+    @media (min-width: 769px) {{
+        .stChatInput {{
+            padding-left: 320px !important; 
+            padding-right: 400px !important;
+        }}
+    }}
+    
+    /* Padding Input Chat di Mobile (Lebih Lega) */
+    @media (max-width: 768px) {{
+        .stChatInput {{
+            padding-left: 10px !important; 
+            padding-right: 10px !important;
+        }}
+        .block-container {{
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }}
+        /* Sembunyikan kolom kanan di mobile, atau taruh di bawah */
+        .chat-row .bubble {{ max-width: 90% !important; }}
     }}
 
     /* Styling Bubble Chat */
@@ -78,7 +115,7 @@ st.markdown(f"""
         box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
         border: 1px solid rgba(255,255,255,0.1);
     }}
-    .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; flex-shrink: 0; border: 2px solid #2563EB; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }}
+    .chat-row.user .avatar {{ margin-left: 12px; width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; border: 2px solid #2563EB; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }}
 
     .chat-row.ai {{ justify-content: flex-start; }}
     .chat-row.ai .bubble {{
@@ -87,11 +124,11 @@ st.markdown(f"""
         border: 1px solid rgba(59, 130, 246, 0.3);
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }}
-    .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
+    .chat-row.ai .avatar {{ margin-right: 12px; width: 40px; height: 40px; border-radius: 50%; background-color: #1E293B; background-size: cover; background-position: center; flex-shrink: 0; border: 2px solid #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }}
 
     /* Styling Panel Kanan */
     .ai-profile {{ text-align: center; padding: 20px 0; background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(6,8,14,0) 100%); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(37,99,235,0.2); }}
-    .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); }}
+    .ai-avatar-big {{ width: 100px; height: 100px; background: #0B0F19; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #2563EB; box-shadow: 0 0 30px rgba(37,99,235,0.6); background-size: cover; background-position: center; }}
     
     .capability-item {{ display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }}
     .capability-item:hover {{ background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); }}
@@ -116,7 +153,13 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # Cek apakah user login (lewat Google atau Tamu)
 is_guest = st.session_state.get("guest_mode", False)
-is_logged_in = st.user.is_logged_in or is_guest
+# Pastikan st.user tersedia (untuk berjaga-jaga jika auth belum di-setup)
+try:
+    is_logged_in_google = st.user.is_logged_in
+except Exception:
+    is_logged_in_google = False
+    
+is_logged_in = is_logged_in_google or is_guest
 
 if not is_logged_in:
     # Tampilan Login Modern (Tapi Tombol Asli Streamlit)
@@ -164,15 +207,16 @@ if not is_logged_in:
             st.rerun()
         
     st.stop()
+
 # Setup User Info
 if is_guest:
     user_email = "tamu@guest.com" 
     display_name = "Tamu"
-    avatar_to_use = "" 
+    avatar_to_use = "" # Tamu pakai inisial/icon default
 else:
     user_email = st.user.email
     display_name = user_email.split("@")[0]
-    avatar_to_use = user_avatar_b64
+    avatar_to_use = avatar_user_src
 
 folder_user = f"data_{user_email.replace('@', '_').replace('.', '_')}"
 os.makedirs(folder_user, exist_ok=True)
@@ -216,14 +260,6 @@ def extract_text_from_pdf(file):
     reader = PdfReader(file); text = ""
     for page in reader.pages: text += page.extract_text() + "\n"
     return text
-def ambil_teks_dari_url(url):
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        for script in soup(["script", "style"]): script.decompose()
-        return soup.get_text(separator=' ', strip=True)[:15000]
-    except Exception as e: return f"Error: Gagal mengambil teks. ({e})"
 
 def bikin_chat_baru():
     new_id = str(uuid.uuid4())[:8]
@@ -243,9 +279,11 @@ def render_pesan(teks, is_user=False):
     teks_html = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank" style="color:#3B82F6; text-decoration:underline;">\1</a>', teks_html)
 
     if is_user:
-        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url(data:image/png;base64,{avatar_to_use});"></div></div>', unsafe_allow_html=True)
+        # Gunakan avatar_user_src yang sudah kita tentukan (lokal atau URL)
+        st.markdown(f'<div class="chat-row user"><div class="bubble">{teks_html}</div><div class="avatar" style="background-image: url({avatar_user_src});"></div></div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url(data:image/png;base64,{bot_avatar_b64});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
+        # Gunakan avatar_bot_src
+        st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url({avatar_bot_src});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
 # ===== SIDEBAR KIRI =====
 with st.sidebar:
@@ -253,7 +291,7 @@ with st.sidebar:
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Asisten Cerdas Anda</p>", unsafe_allow_html=True)
     
     if avatar_to_use:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url(data:image/png;base64,{avatar_to_use}); background-size:cover; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url({avatar_to_use}); background-size:cover; background-position:center; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background:#1E293B; border: 2px solid #3B82F6; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     
@@ -294,10 +332,8 @@ with st.sidebar:
 
 # ===== KONTEN UTAMA =====
 if st.session_state.get("menu") == "about":
-    if foto_profil_b64:
-        foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url(data:image/png;base64,{foto_profil_b64}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
-    else:
-        foto_html = '<div style="width: 150px; height: 150px; background: #1E293B; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);">🧑‍💻</div>'
+    # Bagian Tentang Pembuat
+    foto_html = f'<div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px auto; background-image: url({avatar_profil_src}); background-size: cover; background-position: center; border: 4px solid #2563EB; box-shadow: 0 0 40px rgba(37,99,235,0.6);"></div>'
 
     html_content = f"""
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
@@ -342,12 +378,14 @@ if st.session_state.get("menu") == "about":
         st.rerun()
 
 else:
+    # Layout Responsif: Di Desktop 2 kolom, di HP menumpuk (Chat di atas)
     col_chat, col_right = st.columns([2.5, 1])
     
     with col_right:
-        st.markdown("""
+        # Profil Bot
+        st.markdown(f"""
         <div class="ai-profile">
-            <div class="ai-avatar-big">🤖</div>
+            <div class="ai-avatar-big" style="background-image: url({avatar_bot_src});"></div>
             <h3 style="margin:0; color:white;">Rval AI</h3>
             <p style="color:#9CA3AF; font-size:12px;">Selalu siap membantu 24/7</p>
         </div>
