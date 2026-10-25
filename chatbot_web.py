@@ -20,33 +20,30 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== FUNGSI AVATAR (ANTI-HILANG) =====
-def get_image_base64(path):
+# ===== AVATAR BASE64 (ANTI BLOKIR & ANTI RUSAK) =====
+# Gambar default (Base64) agar PASTI muncul tanpa internet
+DEFAULT_USER_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0I4MkY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIwIDIxdjJjMC0yLjIxLTEuNzktNC00LTRINmMtMi4yMSAwLTQgMS43OS00IDR2MiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iNyIgcj0iNCIvPjwvc3ZnPg=="
+DEFAULT_BOT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0I4MkY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMyIgeT0iMTEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMCIgcng9IjIiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjUiIHI9IjIiLz48cGF0aCBkPSJNMTIgN3Y0Ii8+PGxpbmUgeDE9IjgiIHkxPSIxNiIgeDI9IjgiIHkyPSIxNiIvPjxsaW5lIHgxPSIxNiIgeTE9IjE2IiB4Mj0iMTYiIHkyPSIxNiIvPjwvc3ZnPg=="
+DEFAULT_PROFIL_AVATAR = DEFAULT_USER_AVATAR
+
+def get_image_base64(path, default):
     try:
         with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+            return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
     except FileNotFoundError:
-        return ""
+        return default
 
-user_avatar_b64 = get_image_base64("user_avatar.png")
-bot_avatar_b64 = get_image_base64("bot_avatar.png")
-foto_profil_b64 = get_image_base64("foto_profil.png")
-
-# Fallback URL Publik jika file lokal tidak ada
-URL_USER = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-URL_BOT = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"
-URL_PROFIL = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-
-avatar_user_src = f"data:image/png;base64,{user_avatar_b64}" if user_avatar_b64 else URL_USER
-avatar_bot_src = f"data:image/png;base64,{bot_avatar_b64}" if bot_avatar_b64 else URL_BOT
-avatar_profil_src = f"data:image/png;base64,{foto_profil_b64}" if foto_profil_b64 else URL_PROFIL
+avatar_user_src = get_image_base64("user_avatar.png", DEFAULT_USER_AVATAR)
+avatar_bot_src = get_image_base64("bot_avatar.png", DEFAULT_BOT_AVATAR)
+avatar_profil_src = get_image_base64("foto_profil.png", DEFAULT_PROFIL_AVATAR)
 
 # ===== CSS MODERN & RESPONSIF =====
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
-    #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} header {{visibility: hidden;}}
+    #MainMenu {{visibility: hidden;}} footer {{visibility: hidden;}} 
+    /* Jangan sembunyikan header, kita butuh tombol menu di HP */
     
     .stApp {{ background: radial-gradient(circle at top left, #1A1B3A 0%, #06080E 100%); }}
     
@@ -54,22 +51,16 @@ st.markdown(f"""
     [data-testid="stSidebar"] {{ 
         background-color: #0B0F19 !important; 
         border-right: 1px solid #1F2937;
-        z-index: 999999 !important; /* Pastikan di atas elemen lain */
     }}
-    /* Tombol panah buka sidebar dipaksa muncul */
-    button[kind="header"] {{ display: block !important; color: white !important; }}
-    [data-testid="collapsedControl"] {{ display: block !important; z-index: 999999 !important; }}
+    /* Biarkan tombol hamburger muncul */
+    [data-testid="collapsedControl"] {{ display: block !important; color: white !important; }}
+    header {{ background: transparent !important; }}
 
-    /* CHAT INPUT FIX */
+    /* CHAT INPUT (TANPA FIXED AGAR TIDAK FREEZE DI HP) */
     [data-testid="stChatInput"] {{
-        position: fixed !important;
-        bottom: 0px !important;
-        left: 0px !important;
-        width: 100% !important;
         background: #06080E !important;
-        padding: 15px 20px !important;
-        z-index: 9999 !important;
         border-top: 1px solid #1F2937;
+        padding: 10px 20px !important;
     }}
     
     /* Padding Input Desktop */
@@ -78,11 +69,11 @@ st.markdown(f"""
     }}
     /* Padding Input Mobile */
     @media (max-width: 768px) {{
-        .stChatInput {{ padding-left: 10px !important; padding-right: 10px !important; }}
-        .block-container {{ padding-left: 1rem !important; padding-right: 1rem !important; }}
-        /* Sembunyikan kolom kanan di HP agar chat lega */
+        .stChatInput {{ padding-left: 5px !important; padding-right: 5px !important; }}
+        .block-container {{ padding: 1rem !important; }}
+        /* Sembunyikan kolom kanan di HP */
         .hide-on-mobile {{ display: none !important; }}
-        .chat-row .bubble {{ max-width: 90% !important; }}
+        .chat-row .bubble {{ max-width: 95% !important; }}
     }}
 
     /* BUBBLE CHAT */
@@ -154,7 +145,7 @@ if not is_logged_in:
 if is_guest:
     user_email = "tamu@guest.com" 
     display_name = "Tamu"
-    avatar_to_use = URL_USER # Tamu pakai avatar default (tidak kosong lagi)
+    avatar_to_use = DEFAULT_USER_AVATAR
 else:
     user_email = st.user.email
     display_name = user_email.split("@")[0]
@@ -224,14 +215,12 @@ def render_pesan(teks, is_user=False):
     else:
         st.markdown(f'<div class="chat-row ai"><div class="avatar" style="background-image: url({avatar_bot_src});"></div><div class="bubble">{teks_html}</div></div>', unsafe_allow_html=True)
 
-# ===== LOGIKA MENU (PENGGANTI SIDEBAR DI HP) =====
-# Jika di HP, tampilkan tombol toggle untuk membuka menu
+# ===== SIDEBAR =====
 with st.sidebar:
     st.markdown("<h2 style='color:#3B82F6; display:flex; align-items:center; gap:10px; text-shadow: 0 0 10px rgba(59,130,246,0.5);'><span style='font-size:30px;'>✨</span> Rval AI</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color:#6B7280; font-size:12px; margin-top:-15px;'>Asisten Cerdas Anda</p>", unsafe_allow_html=True)
     
-    if avatar_to_use:
-        st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url({avatar_to_use}); background-size:cover; background-position:center; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="display:flex; align-items:center; gap:10px; margin:20px 0; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px;"><div style="width:40px; height:40px; border-radius:50%; background-image: url({avatar_to_use}); background-size:cover; background-position:center; border: 2px solid #3B82F6;"></div><div><b>{display_name}</b><br><span style="font-size:10px; color:#6B7280;">{"Tamu" if is_guest else "Premium"}</span></div></div>', unsafe_allow_html=True)
     
     if "menu" not in st.session_state: st.session_state.menu = "chat"
     
@@ -299,13 +288,12 @@ if st.session_state.get("menu") == "about":
         st.session_state.menu = "chat"; st.query_params.clear(); st.rerun()
 
 else:
-    # --- HEADER CHAT & MENU TOGGLE UNTUK MOBILE ---
+    # --- HEADER CHAT ---
     st.markdown('<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937; margin-bottom:20px;"><div><h2 style="margin:0; color:white;">Chat dengan Rval AI</h2><p style="margin:0; font-size:12px; color:#9CA3AF;">Tanya apa saja!</p></div><div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.1); color:#22C55E; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid rgba(34,197,94,0.2); box-shadow: 0 0 10px rgba(34,197,94,0.2);"><div style="width:8px; height:8px; border-radius:50%; background:#22C55E;"></div> Online</div></div>', unsafe_allow_html=True)
 
     col_chat, col_right = st.columns([2.5, 1])
     
     with col_right:
-        # Class "hide-on-mobile" akan menyembunyikan ini di HP agar layar lega
         st.markdown(f"""
         <div class="ai-profile hide-on-mobile">
             <div class="ai-avatar-big" style="background-image: url({avatar_bot_src});"></div>
